@@ -1,0 +1,7 @@
+{
+  "/": {"active": false, "name": "Главная"},
+  "/lk": {"active": false, "name": "Личная информация"},
+  "/invites": {"active": false, "name": "Приглашения"},
+  "/results": {"active": false, "name": "Результаты"},
+  "/contacts": {"active": false, "name": "Контакты"}
+}

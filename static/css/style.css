@@ -1,0 +1,16 @@
+/*@font-face {
+    font-family: 'MyWebFont';
+    src: url('static/fonts/sf_regular.ttf')  format('truetype'),
+         url('static/fonts/sf_bold.ttf')  format('truetype'),
+         url('static/fonts/sf_bold_italic.ttf')  format('truetype'),
+         url('static/fonts/sf_regular_italic.ttf')  format('truetype');
+}*/
+
+.base-style{
+    padding-top: 20px;
+    background: #efc9af;
+    font-size: 18px;
+    margin: auto;
+    width: 80%;
+    color: #104c91;
+}
