@@ -9,10 +9,8 @@
 <body class="base-style">
 <nav>
 <div class="alert alert-primary" role="alert">
-    <h1>Поступление в Лицей "Вторая Школа"
-        <small class="text-muted">sch2admission.ru</small>
-    </h1>
-<div class="btn-group">
+    <h1>Поступление в Лицей "Вторая Школа"</h1>
+
     {% if current_user.is_authenticated %}
         {% for page in pages %}
             {% if pages[page["active"]] %}
@@ -22,10 +20,10 @@
             {% endif %}
         {% endfor %}
     {% else %}
-        <a href="register" class="btn btn-primary">Зарегистрироваться</a>
-        <a href="login" class="btn btn-primary">Войти</a>
+        <a href="register" class="btn btn-primary">Зарегистрироваться на экзамены</a>
+        <a href="login" class="btn btn-primary">Войти в кабинет поступающего</a>
     {% endif %}
-</div>
+
 </div>
 </nav>
 {% block content %}{% endblock %}
