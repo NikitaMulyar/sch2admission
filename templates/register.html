@@ -2,12 +2,12 @@
 
 {% block content %}
 <h2 class="h2-style"><b>{{ title }}</b></h2><br>
-<form action="" method="post">
+<form action="" method="post" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
     <p>
-        {{ form.email.label }}<br>
-        {{ form.email(class="form-control", type="email") }}
+        {{ form.email.label }}
         <div class="description_form">{{ form.email.description }}</div>
+        {{ form.email(class="form-control", type="email") }}
         {% for error in form.email.errors %}
             <p class="alert alert-danger" role="alert">
                 {{ error }}
@@ -15,9 +15,9 @@
         {% endfor %}
     </p>
     <p>
-        {{ form.surname.label }}<br>
-        {{ form.surname(class="form-control") }}
+        {{ form.surname.label }}
         <div class="description_form">{{ form.surname.description }}</div>
+        {{ form.surname(class="form-control") }}
         {% for error in form.surname.errors %}
             <p class="alert alert-danger" role="alert">
                 {{ error }}
@@ -25,9 +25,9 @@
         {% endfor %}
     </p>
     <p>
-        {{ form.name.label }}<br>
-        {{ form.name(class="form-control") }}
+        {{ form.name.label }}
         <div class="description_form">{{ form.name.description }}</div>
+        {{ form.name(class="form-control") }}
         {% for error in form.name.errors %}
             <p class="alert alert-danger" role="alert">
                 {{ error }}
@@ -35,9 +35,9 @@
         {% endfor %}
     </p>
     <p>
-        {{ form.third_name.label }}<br>
-        {{ form.third_name(class="form-control") }}
+        {{ form.third_name.label }}
         <div class="description_form">{{ form.third_name.description }}</div>
+        {{ form.third_name(class="form-control") }}
         {% for error in form.third_name.errors %}
             <p class="alert alert-danger" role="alert">
                 {{ error }}
@@ -45,9 +45,9 @@
         {% endfor %}
     </p>
     <p>
-        {{ form.class_number.label }}<br>
-        {{ form.class_number(class="form-control") }}
+        {{ form.class_number.label }}
         <div class="description_form">{{ form.class_number.description }}</div>
+        {{ form.class_number(class="form-control") }}
         {% for error in form.class_number.errors %}
             <p class="alert alert-danger" role="alert">
                 {{ error }}
@@ -56,9 +56,9 @@
     </p>
     {% if form.profile %}
         <p>
-            {{ form.profile.label }}<br>
-            {{ form.profile(class="form-control") }}
+            {{ form.profile.label }}
             <div class="description_form">{{ form.profile.description }}</div>
+            {{ form.profile(class="form-control") }}
             {% for error in form.profile.errors %}
                 <p class="alert alert-danger" role="alert">
                     {{ error }}
@@ -67,9 +67,9 @@
         </p>
     {% endif %}
     <p>
-        {{ form.birth_date.label }}<br>
-        {{ form.birth_date(class="form-control") }}
+        {{ form.birth_date.label }}
         <div class="description_form">{{ form.birth_date.description }}</div>
+        {{ form.birth_date(class="form-control") }}
         {% for error in form.birth_date.errors %}
             <p class="alert alert-danger" role="alert">
                 {{ error }}
@@ -77,9 +77,9 @@
         {% endfor %}
     </p>
     <p>
-        {{ form.school.label }}<br>
-        {{ form.school(class="form-control") }}
+        {{ form.school.label }}
         <div class="description_form">{{ form.school.description }}</div>
+        {{ form.school(class="form-control") }}
         {% for error in form.school.errors %}
             <p class="alert alert-danger" role="alert">
                 {{ error }}
@@ -87,9 +87,9 @@
         {% endfor %}
     </p>
     <p>
-        {{ form.about.label }}<br>
-        {{ form.about(class="form-control") }}
+        {{ form.about.label }}
         <div class="description_form">{{ form.about.description }}</div>
+        {{ form.about(class="form-control") }}
         {% for error in form.about.errors %}
             <p class="alert alert-danger" role="alert">
                 {{ error }}
@@ -97,9 +97,9 @@
         {% endfor %}
     </p>
     <p>
-        {{ form.family_friends_in_l2sh.label }}<br>
-        {{ form.family_friends_in_l2sh(class="form-control") }}
+        {{ form.family_friends_in_l2sh.label }}
         <div class="description_form">{{ form.family_friends_in_l2sh.description }}</div>
+        {{ form.family_friends_in_l2sh(class="form-control") }}
         {% for error in form.family_friends_in_l2sh.errors %}
             <p class="alert alert-danger" role="alert">
                 {{ error }}
@@ -107,9 +107,9 @@
         {% endfor %}
     </p>
     <p>
-        {{ form.parent_surname.label }}<br>
-        {{ form.parent_surname(class="form-control") }}
+        {{ form.parent_surname.label }}
         <div class="description_form">{{ form.parent_surname.description }}</div>
+        {{ form.parent_surname(class="form-control") }}
         {% for error in form.parent_surname.errors %}
             <p class="alert alert-danger" role="alert">
                 {{ error }}
@@ -117,9 +117,9 @@
         {% endfor %}
     </p>
     <p>
-        {{ form.parent_name.label }}<br>
-        {{ form.parent_name(class="form-control") }}
+        {{ form.parent_name.label }}
         <div class="description_form">{{ form.parent_name.description }}</div>
+        {{ form.parent_name(class="form-control") }}
         {% for error in form.parent_name.errors %}
             <p class="alert alert-danger" role="alert">
                 {{ error }}
@@ -127,9 +127,9 @@
         {% endfor %}
     </p>
     <p>
-        {{ form.parent_third_name.label }}<br>
-        {{ form.parent_third_name(class="form-control") }}
+        {{ form.parent_third_name.label }}
         <div class="description_form">{{ form.parent_third_name.description }}</div>
+        {{ form.parent_third_name(class="form-control") }}
         {% for error in form.parent_third_name.errors %}
             <p class="alert alert-danger" role="alert">
                 {{ error }}
@@ -137,9 +137,9 @@
         {% endfor %}
     </p>
     <p>
-        {{ form.parent_phone_number.label }}<br>
-        {{ form.parent_phone_number(class="form-control") }}
+        {{ form.parent_phone_number.label }}
         <div class="description_form">{{ form.parent_phone_number.description }}</div>
+        {{ form.parent_phone_number(class="form-control") }}
         {% for error in form.parent_phone_number.errors %}
             <p class="alert alert-danger" role="alert">
                 {{ error }}
@@ -147,9 +147,9 @@
         {% endfor %}
     </p>
     <p>
-        {{ form.photo.label }}<br>
-        {{ form.photo(class="form-control") }}
+        {{ form.photo.label }}
         <div class="description_form">{{ form.photo.description }}</div>
+        {{ form.photo(class="form-control") }}
         {% for error in form.photo.errors %}
             <p class="alert alert-danger" role="alert">
                 {{ error }}

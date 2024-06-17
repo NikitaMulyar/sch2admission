@@ -1,5 +1,5 @@
 {
-  "/lk": {"active": false, "name": "Личная информация"},
-  "/invites": {"active": false, "name": "Приглашения"},
-  "/results": {"active": false, "name": "Результаты"}
+  "/lk": "Личная информация",
+  "/invites": "Приглашения",
+  "/results": "Результаты"
 }
