@@ -6,11 +6,42 @@
          url('static/fonts/sf_regular_italic.ttf')  format('truetype');
 }*/
 
-.base-style{
+#base-style{
     padding-top: 20px;
-    background: #f6ead4;
+    background: #eae7dc;
     font-size: 18px;
     margin: auto;
     width: 70%;
-    color: #4a536b;
+    color: #374785;
+}
+
+#footer-style{
+    background: #d8c3a5 !important;
+    border-top: 2px solid #374785 !important;
+    text-align: center;
+    font-size: 14px !important;
+    padding-top: 10px;
+    padding-bottom: 1px;
+    margin-top: 40%;
+}
+
+.h2-style{
+    color: #464866;
+    text-align: center;
+    margin: auto;
+    border-bottom: 2px solid #d8c3a5;
+    max-width: 60%;
+}
+
+.p-style{
+    color: #343434;
+    padding-left: 10px;
+}
+
+#nav-buttons{
+    margin: 5px;
+}
+
+.description_form{
+    font-size: 14px !important;
 }

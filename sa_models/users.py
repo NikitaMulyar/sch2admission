@@ -12,15 +12,20 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     third_name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     class_number = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
-    status = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
-    # 0 - В конкурсе, 1 - Выбыл из конкурса, 2 - Принят, 3 - Резерв
+    status = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    # 0 - В конкурсе, 1 - Выбыл из конкурса, 2 - Принят, 3 - Резерв, 4 - Заявка в обработке
     birth_date = sqlalchemy.Column(sqlalchemy.Date, nullable=True)
     email = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     school = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     parent_surname = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     parent_name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     parent_third_name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    parent_phone = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    parent_phone_number = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    photo_path = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    profile_10_11 = sqlalchemy.Column(sqlalchemy.String, default='Общий')
+    about = sqlalchemy.Column(sqlalchemy.Text, nullable=True)
+    family_friends_in_l2sh = sqlalchemy.Column(sqlalchemy.Text, nullable=True)
 
     def __repr__(self):
         return f'<User> {self.id} {self.surname} {self.name}'
