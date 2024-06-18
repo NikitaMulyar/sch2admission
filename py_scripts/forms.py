@@ -6,15 +6,18 @@ from flask_wtf.file import FileAllowed, FileRequired
 
 
 class LoginForm(FlaskForm):
-    email = EmailField('Почта', validators=[DataRequired()])
-    password = PasswordField('Пароль', validators=[DataRequired()])
+    email = EmailField('Введите адрес эл. почты', validators=[DataRequired()],
+                       description='Укажите адрес, указанный при регистрации.')
+    password = PasswordField('Введите пароль', validators=[DataRequired()],
+                             description='Пароль был выслан после регистрации на указанную вами эл. почту. Проверьте папку "Спам".')
     remember_me = BooleanField('Запомнить меня')
     submit = SubmitField('Войти')
 
 
 class RegisterFormClasses6To9(FlaskForm):
     email = EmailField('Введите адрес эл. почты', validators=[DataRequired()],
-                       description='В дальнейшем он будет использоваться для связи, отправления приглашений и входа на сайт')
+                       description='В дальнейшем он будет использоваться для связи, отправления приглашений и входа на сайт. '
+                                   'После заполнения формы на него придет пароль от вашего личного кабинета')
     surname = StringField('Введите фамилию поступающего', validators=[DataRequired()])
     name = StringField('Введите имя поступающего', validators=[DataRequired()])
     third_name = StringField('Введите отчество поступающего', validators=[DataRequired()])
@@ -45,3 +48,11 @@ class RegisterFormClasses10To11(RegisterFormClasses6To9):
                           choices=["Физический", "Математический", "Математико-программистский",
                                    "Математико-экономический"], validators=[DataRequired()],
                           description='Нажмите на поле, чтобы выбрать профиль')
+
+
+class RegisterFormAdmins:
+    email = EmailField('Введите адрес эл. почты', validators=[DataRequired()],
+                       description='По возможности нужно указать лицейскую почту. После заполнения формы на него придет пароль от вашего личного кабинета')
+    surname = StringField('Введите вашу фамилию', validators=[DataRequired()])
+    name = StringField('Введите ваше имя', validators=[DataRequired()])
+    third_name = StringField('Введите ваше отчество', validators=[DataRequired()])

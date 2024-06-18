@@ -8,6 +8,7 @@ class Exam(SqlAlchemyBase):
     __tablename__ = 'exams'
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     title = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    number = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     time = sqlalchemy.Column(sqlalchemy.DateTime, nullable=True)
 
     invites = orm.relationship("Invite", back_populates="parent_exam", cascade="all, delete")

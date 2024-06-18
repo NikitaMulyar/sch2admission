@@ -1,6 +1,8 @@
 import datetime
 
 import sqlalchemy
+from sqlalchemy.orm import relationship
+
 from .db_session import SqlAlchemyBase
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
@@ -16,8 +18,10 @@ class Admin(SqlAlchemyBase, UserMixin, SerializerMixin):
     email = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
+    notes = relationship("Note", back_populates="author")
+
     def __repr__(self):
-        return f'<User> {self.id} {self.surname} {self.name}'
+        return f'<Admin> {self.id} {self.surname} {self.name}'
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
