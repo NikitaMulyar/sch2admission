@@ -12,6 +12,7 @@ class Invite(SqlAlchemyBase):
     exam_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("exams.id"))
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
     made_on = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now())
+    edited_on = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now())
     viewed = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
     result = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     exam_description = sqlalchemy.Column(sqlalchemy.Text, nullable=True)

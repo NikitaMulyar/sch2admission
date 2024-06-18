@@ -38,9 +38,10 @@ def register_user(request: request, form: RegisterFormClasses10To11):
     type_ = uploaded_file.filename.split('.')[-1]
     file_path = os.path.join('abitur_data', 'photos', f'{form.surname.data}_{form.name.data}_{form.third_name.data}.{type_}')
     uploaded_file.save(file_path)
-    prof = 'Общий'
-    if form.profile.data:
+    try:
         prof = form.profile.data
+    except Exception:
+        prof = 'Общий'
     user = User(
         email=form.email.data,
         name=form.name.data,

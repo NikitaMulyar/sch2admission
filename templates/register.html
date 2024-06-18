@@ -3,13 +3,7 @@
 {% block content %}
 <h2 class="h2-style"><b>{{ title }}</b></h2><br>
 <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
-<script type="text/javascript">
-document.getElementById("collapse-btn").onclick = function() {
-    var myCollapse = document.getElementById('collapseExample').delay(3000);
-    myCollapse.toggle = false;
-};
-</script>
-<form action="" method="post" enctype="multipart/form-data">
+<form action="" method="post" enctype="multipart/form-data" id="myForm">
     {{ form.hidden_tag() }}
     <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
       <symbol id="check-circle-fill" viewBox="0 0 16 16">
@@ -216,11 +210,15 @@ document.getElementById("collapse-btn").onclick = function() {
             </div>
         {% endfor %}
     </p>
-    <p>{{ form.submit(type="submit", class="btn btn-primary", **{'data-bs-toggle': "collapse", 'data-bs-target': "#collapseExample", 'aria-expanded': "false", 'aria-controls': "collapseExample", "id": "collapse-btn"}) }}</p>
+    <p>{{ form.submit(type="submit", class="btn btn-primary", **{"id": "myBtn", "onclick": "myScript();"}) }}</p>
     <div class="collapse" id="collapseExample">
-      <div class="card card-body">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      <div class="card card-body" style="max-width: 40% !important;">
         Одну секунду, проверяем данные...
       </div>
     </div>
 </form>
+    <script src="/static/js/register.js"></script>
 {% endblock %}
