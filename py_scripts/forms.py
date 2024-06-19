@@ -71,6 +71,7 @@ class RegisterFormAdmins(FlaskForm):
     surname = StringField('Введите вашу фамилию', validators=[DataRequired('Обязательное поле')])
     name = StringField('Введите ваше имя', validators=[DataRequired('Обязательное поле')])
     third_name = StringField('Введите ваше отчество', validators=[DataRequired('Обязательное поле')])
+    submit = SubmitField('Продолжить')
 
 
 class RecoverForm(FlaskForm):

@@ -24,18 +24,21 @@
     {% else %}
         <a href="/contacts" class="btn btn-primary" id="nav-buttons">Контакты</a>
     {% endif %}
-    {% if "/materials" == current %}
-        <a href="https://lycuz2.mskobr.ru/roditelyam/algoritm-postuplenia/profilnye-klassy#/html/body/div[2]/div[3]/div/div[2]/div/div[3]/div[1]/div/div/div[1]/div/div/div" class="btn btn-primary active" aria-current="page" id="nav-buttons" target="_blank">Материалы для подготовки</a>
-    {% else %}
-        <a href="https://lycuz2.mskobr.ru/roditelyam/algoritm-postuplenia/profilnye-klassy#/html/body/div[2]/div[3]/div/div[2]/div/div[3]/div[1]/div/div/div[1]/div/div/div" class="btn btn-primary" id="nav-buttons" target="_blank">Материалы для подготовки</a>
-    {% endif %}
-
-    {% if current_user.is_authenticated %}
+    <a href="https://lycuz2.mskobr.ru/roditelyam/algoritm-postuplenia/profilnye-klassy#/html/body/div[2]/div[3]/div/div[2]/div/div[3]/div[1]/div/div/div[1]/div/div/div" class="btn btn-primary" id="nav-buttons" target="_blank">Материалы для подготовки</a>
+    {% if current_user.is_authenticated and current_user.role != 'admin' %}
         {% for page in pages %}
             {% if page == current %}
                  <a href="{{ page }}" class="btn btn-primary active" aria-current="page" id="nav-buttons">{{ pages[page] }}</a>
             {% else %}
                 <a href="{{ page }}" class="btn btn-primary" id="nav-buttons">{{ pages[page] }}</a>
+            {% endif %}
+        {% endfor %}
+    {% elif current_user.is_authenticated and current_user.role == 'admin' %}
+        {% for page in admin_pages %}
+            {% if page == current %}
+                 <a href="{{ page }}" class="btn btn-primary active" aria-current="page" id="nav-buttons">{{ admin_pages[page] }}</a>
+            {% else %}
+                <a href="{{ page }}" class="btn btn-primary" id="nav-buttons">{{ admin_pages[page] }}</a>
             {% endif %}
         {% endfor %}
     {% else %}

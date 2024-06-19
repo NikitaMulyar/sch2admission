@@ -7,8 +7,10 @@ from sa_models.users import User
 from sa_models.recovers import Recover
 
 import json
-from py_scripts.forms import RegisterFormClasses6To9, RegisterFormClasses10To11, LoginForm, RecoverForm
-from py_scripts.funcs_back import register_user, generate_data_for_base, generate_and_send_recover_link, reset_password
+from py_scripts.forms import (RegisterFormClasses6To9, RegisterFormClasses10To11, LoginForm, RecoverForm,
+                              RegisterFormAdmins)
+from py_scripts.funcs_back import (register_user, generate_data_for_base, generate_and_send_recover_link, reset_password,
+                                   register_admin)
 
 
 app = Flask(__name__)
@@ -87,8 +89,29 @@ def back_register(classes):
         return redirect('/')
 
     reg_statuses = json.load(open('py_scripts/consts/registration_status.json', mode='rb'))
-    if not reg_statuses.get(classes):
+    admin_link = open('py_scripts/consts/admin_registration_link.txt', mode='r', encoding='utf-8').read()
+    if not reg_statuses.get(classes) and classes != admin_link:
         abort(404)
+
+    if classes == admin_link:
+        title = 'Регистрация администраторов в системе'
+        form = RegisterFormAdmins()
+        if form.validate_on_submit():
+            db_sess = db_session.create_session()
+            user_exist = db_sess.query(User).where(User.email == form.email.data).first()
+            if user_exist:
+                db_sess.close()
+                form.email.errors.append('Пользователь с такой эл. почтой уже существует.')
+            else:
+                db_sess.close()
+                res = register_admin(form)
+                if res != -1:
+                    resp = make_response(redirect('/login'))
+                    resp.set_cookie("server_data", res, max_age=60 * 60 * 24 * 365)
+                    return resp
+                form.email.errors.append('Не получилось отправить письмо с паролем на указанную почту.')
+        return render_template('admin_register.html', form=form,
+                               **generate_data_for_base(f'/register/{classes}', title))
 
     title = 'Регистрация на вступительные испытания в 6, 7, 8, 9 классы'
     if classes == '10-11':

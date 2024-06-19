@@ -4,7 +4,7 @@ from email.mime.text import MIMEText
 import phonenumbers
 from flask import request, url_for
 from flask_login import current_user, login_user
-from py_scripts.forms import RegisterFormClasses10To11
+from py_scripts.forms import RegisterFormClasses10To11, RegisterFormAdmins
 from sa_models.users import User
 from sa_models.notifications import Notification
 from sa_models.recovers import Recover
@@ -89,12 +89,43 @@ def register_user(request: request, form: RegisterFormClasses10To11):
     return uid
 
 
+def register_admin(form: RegisterFormAdmins):
+    try:
+        psw = generate_and_send_password(form.email.data, form.name.data, form.surname.data)
+    except Exception:
+        return -1
+
+    user = User(
+        email=form.email.data,
+        name=form.name.data,
+        surname=form.surname.data,
+        third_name=form.third_name.data,
+        role='admin'
+    )
+    user.set_password(psw)
+    db_sess = db_session.create_session()
+    db_sess.add(user)
+    db_sess.commit()
+    uid = str(user.id)
+    new_notif = Notification(
+        user_id=user.id,
+        text='На вашу почту выслано письмо с паролем от личного кабинета. Проверьте папку "Спам".',
+        type='system'
+    )
+    new_notif.set_str_date()
+    db_sess.add(new_notif)
+    db_sess.commit()
+    db_sess.close()
+    return uid
+
+
 def generate_data_for_base(current='/', title='Главная', user_id=''):
     reg_stats = json.load(open('py_scripts/consts/registration_status.json', mode='rb'))
     d = dict()
     d['exams_on'] = reg_stats
     d['pic_url'] = url_for('static', filename='img/logo.png')
     d['pages'] = json.load(open('py_scripts/consts/pages.json', mode='rb'))
+    d['admin_pages'] = json.load(open('py_scripts/consts/admin_pages.json', mode='rb'))
     d['current'] = current
     d['title'] = title
     db_sess = db_session.create_session()
