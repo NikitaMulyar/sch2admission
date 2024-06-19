@@ -30,9 +30,10 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     profile_10_11 = sqlalchemy.Column(sqlalchemy.String, default='Общий')
     about = sqlalchemy.Column(sqlalchemy.Text, nullable=True)
     family_friends_in_l2sh = sqlalchemy.Column(sqlalchemy.Text, nullable=True)
-    reg_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now())
+    reg_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 
     invites = orm.relationship("Invite", back_populates="parent_user", cascade="all, delete")
+    notifications = orm.relationship("Notification", back_populates="parent_user", cascade="all, delete")
 
     def __repr__(self):
         return f'<User> {self.id} {self.surname} {self.name}'

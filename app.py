@@ -1,12 +1,14 @@
-from flask import Flask, render_template, request, redirect, abort, url_for
+from flask import Flask, render_template, request, redirect, abort, make_response
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 
 from sa_models import db_session
+from sa_models.notifications import Notification
 from sa_models.users import User
+from sa_models.recovers import Recover
 
 import json
-from py_scripts.forms import RegisterFormClasses6To9, RegisterFormClasses10To11, LoginForm
-from py_scripts.funcs_back import register_user, generate_data_for_base
+from py_scripts.forms import RegisterFormClasses6To9, RegisterFormClasses10To11, LoginForm, RecoverForm
+from py_scripts.funcs_back import register_user, generate_data_for_base, generate_and_send_recover_link, reset_password
 
 
 app = Flask(__name__)
@@ -25,13 +27,18 @@ def load_user(user_id):
 
 @app.route('/')
 def back_index():
-    return render_template('index.html', **generate_data_for_base())
+    server_data = request.cookies.get("server_data", '')
+    resp = make_response(render_template('index.html', **generate_data_for_base(user_id=server_data)))
+    resp.set_cookie("server_data", server_data, max_age=0)
+    return resp
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def back_login():
     if current_user.is_authenticated:
         return redirect('/')
+
+    server_data = request.cookies.get("server_data", '')
 
     form = LoginForm()
     if form.validate_on_submit():
@@ -47,15 +54,31 @@ def back_login():
             login_user(user_exist, remember=form.remember_me.data)
             db_sess.close()
             return redirect('/')
-    return render_template('login.html', form=form, **generate_data_for_base('/login',
-                                                                             'Авторизация'))
+    resp = make_response(render_template('login.html', form=form,
+                                         **generate_data_for_base('/login', 'Авторизация',
+                                                                  user_id=server_data)))
+    resp.set_cookie("server_data", server_data, max_age=0)
+    return resp
 
 
 @app.route('/logout', methods=['GET'])
 @login_required
 def logout():
+    uid = str(current_user.id)
+    new_notif = Notification(
+        user_id=current_user.id,
+        text='Вы вышли из личного кабинета.',
+        type='system'
+    )
+    new_notif.set_str_date()
+    db_sess = db_session.create_session()
+    db_sess.add(new_notif)
+    db_sess.commit()
+    db_sess.close()
+    resp = make_response(redirect("/"))
+    resp.set_cookie("server_data", uid, max_age=60 * 60 * 24 * 365)
     logout_user()
-    return redirect("/")
+    return resp
 
 
 @app.route('/register/<classes>', methods=['GET', 'POST'])
@@ -84,11 +107,80 @@ def back_register(classes):
         else:
             db_sess.close()
             res = register_user(request, form)
-            if res == 0:
-                return redirect('/login')
+            if res != -1:
+                resp = make_response(redirect('/login'))
+                resp.set_cookie("server_data", res, max_age=60 * 60 * 24 * 365)
+                return resp
             form.email.errors.append('Не получилось отправить письмо с паролем на указанную почту.')
     return render_template('register.html', form=form,
                            **generate_data_for_base(f'/register/{classes}', title))
+
+
+@app.route('/recover/<code>', methods=['GET', 'POST'])
+def back_recover(code):
+    if current_user.is_authenticated:
+        return redirect('/')
+
+    if code == 'recover':
+        server_data = request.cookies.get("server_data", '')
+
+        form = RecoverForm()
+
+        if form.validate_on_submit():
+            db_sess = db_session.create_session()
+            user_exist = db_sess.query(User).where(User.email == form.email.data).first()
+            if not user_exist:
+                db_sess.close()
+                form.email.errors.append('Пользователя с такой эл. почтой не найдено.')
+            else:
+                try:
+                    generate_and_send_recover_link(form.email.data, user_exist.name, user_exist.surname, user_exist.id)
+                    resp = make_response(redirect('/login'))
+                    resp.set_cookie("server_data", str(user_exist.id), max_age=60 * 60 * 24 * 365)
+                    db_sess.close()
+                    return resp
+                except Exception:
+                    form.email.errors.append(
+                        'Не получилось отправить письмо с ссылкой для восстановления пароля на указанную почту.')
+                db_sess.close()
+        resp = make_response(render_template('recover.html', form=form,
+                                             **generate_data_for_base(f'/recover/recover', 'Восстановление пароля',
+                                                                      user_id=server_data)))
+        resp.set_cookie("server_data", server_data, max_age=0)
+        return resp
+
+    db_sess = db_session.create_session()
+    rec_code_exist = db_sess.query(Recover).where(Recover.code == code).first()
+    if not rec_code_exist:
+        db_sess.close()
+        abort(404)
+
+    user = db_sess.query(User).where(User.email == rec_code_exist.email).first()
+    res = reset_password(user.id)
+    attempts = 3
+    while res == -1 and attempts > 0:
+        res = reset_password(user.id)
+        attempts -= 1
+
+    db_sess.delete(rec_code_exist)
+    if res == -1:
+        resp = make_response(redirect('/recover/recover'))
+        resp.set_cookie("server_data", str(user.id), max_age=60 * 60 * 24 * 365)
+        notif = Notification(
+            user_id=user.id,
+            text=f'Не удалось отправить письмо с новым паролем на адрес {user.email}. Попробуйте снова.',
+            type='warn'
+        )
+        notif.set_str_date()
+        db_sess.add(notif)
+        db_sess.commit()
+        db_sess.close()
+        return resp
+
+    login_user(user)
+    db_sess.commit()
+    db_sess.close()
+    return redirect('/')
 
 
 @app.route('/lk')

@@ -40,38 +40,53 @@
         {% endfor %}
     {% else %}
         {% if exams_on["6-9"] %}
-            <a href="/register/6-9" class="btn btn-primary" id="nav-buttons">Регистрация на экзамены в 6, 7, 8, 9 классы</a>
+            {% if "/register/6-9" == current %}
+                <a href="/register/6-9" class="btn btn-primary active" aria-current="page" id="nav-buttons">Регистрация на экзамены в 6, 7, 8, 9 классы</a>
+            {% else %}
+                <a href="/register/6-9" class="btn btn-primary" id="nav-buttons">Регистрация на экзамены в 6, 7, 8, 9 классы</a>
+            {% endif %}
         {% endif %}
         {% if exams_on["10-11"] %}
-            <a href="/register/10-11" class="btn btn-primary" id="nav-buttons">Регистрация на экзамены в 10, 11 классы</a>
+            {% if "/register/10-11" == current %}
+                <a href="/register/10-11" class="btn btn-primary active" aria-current="page" id="nav-buttons">Регистрация на экзамены в 10, 11 классы</a>
+            {% else %}
+                <a href="/register/10-11" class="btn btn-primary" id="nav-buttons">Регистрация на экзамены в 10, 11 классы</a>
+            {% endif %}
         {% endif %}
-        <a href="/login" class="btn btn-primary" id="nav-buttons">Войти в личный кабинет</a>
+        {% if "/login" == current %}
+            <a href="/login" class="btn btn-primary active" aria-current="page" id="nav-buttons">Войти в личный кабинет</a>
+        {% else %}
+            <a href="/login" class="btn btn-primary" id="nav-buttons">Войти в личный кабинет</a>
+        {% endif %}
     {% endif %}
 </div>
 </nav><br>
 {% block content %}{% endblock %}
 <div aria-live="polite" aria-atomic="true" class="position-relative" style="min-width: 100% !important; position: absolute !important; top: 0 !important; left: 0 !important;">
   <div class="toast-container position-absolute top-0 end-0 p-3">
-
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="8000">
-      <div class="toast-body" style="font-size: 16px !important;">
-          <span class="badge rounded-pill bg-danger">Новое</span> <b>Пришел результат экзамена "Математика (письменно)"</b>
-        <div class="mt-2 pt-2 border-top">
-          <button type="button" class="btn btn-dark btn-sm">Показать</button>
-          <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="toast">Позже</button>
+    {% set i = 10000 %}
+    {% for notif in notifications %}
+        <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="{{ i }}">
+          <div class="toast-body" style="font-size: 16px !important;">
+              {% if notif.type == 'system' %}
+                  <span class="badge rounded-pill bg-success">Система</span>
+              {% elif notif.type == 'warn' %}
+                  <span class="badge rounded-pill bg-warning text-dark">Ошибка</span>
+              {% else %}
+                  <span class="badge rounded-pill bg-danger">Новое</span>
+              {% endif %}
+              {{ notif.text }}<br>
+              <small class="text-body-secondary">{{ notif.made_on_str }}</small>
+            <div class="mt-2 pt-2 border-top">
+                {% if notif.type != 'system' %}
+                    <button type="button" class="btn btn-dark btn-sm"><a href="{{ notif.link }}">Показать</a></button>
+                {% endif %}
+                <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="toast">Позже</button>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true"  data-bs-delay="10000">
-      <div class="toast-body" style="font-size: 16px !important;">
-        Hello, world! This is a toast message.
-        <div class="mt-2 pt-2 border-top">
-          <button type="button" class="btn btn-dark btn-sm">Показать</button>
-          <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="toast">Позже</button>
-        </div>
-      </div>
-    </div>
+        {% set i = i + 10000 %}
+    {% endfor %}
   </div>
 </div>
 <footer id="footer-style">

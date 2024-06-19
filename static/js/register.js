@@ -1,8 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
-    var submitButton = document.getElementById('myBtn');
+    const submitButton = document.getElementById('myBtn');
     submitButton.addEventListener('click', function(event) {
         myScript();
-        var form = document.getElementById('myForm');
+        const form = document.getElementById('myForm');
+        submitButton.hidden = true;
         form.submit();
     });
 });
@@ -11,7 +12,9 @@ function myScript() {
     const collapseContent = document.getElementById("collapseExample");
     const bsCollapse = new bootstrap.Collapse(collapseContent);
     bsCollapse.show();
+    const submitButton = document.getElementById('myBtn');
     setTimeout(function() {
         bsCollapse.hide();
-    }, 5000);
+        submitButton.hidden = false;
+    }, 10000);
 }
