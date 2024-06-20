@@ -197,10 +197,6 @@ def back_recover(code):
         return resp
 
     res = reset_password(user.id)
-    attempts = 3
-    while res == -1 and attempts > 0:
-        res = reset_password(user.id)
-        attempts -= 1
 
     db_sess.delete(rec_code_exist)
     if res == -1:
@@ -232,6 +228,7 @@ def back_cabinet():
         ("Статус участия", statuses[current_user.status], current_user.status),
         ("Эл. почта", current_user.email),
         ("Поступающий", f"{current_user.surname} {current_user.name} {current_user.third_name}"),
+        ("Дата рождения", current_user.birth_date.strftime('%d.%m.%Y')),
         ("Поступает в", f"{current_user.class_number} "
                         f"{current_user.profile_10_11.lower() if current_user.class_number >= 10 else ''} класс"),
         ("Школа", current_user.school),
@@ -247,14 +244,14 @@ def back_cabinet():
 @login_required
 def back_invites():
     return render_template('invites.html', **generate_data_for_base('/invites',
-                                                                    'Приглашения на экзамены'))
+                                                                    'Приглашения на вступительные испытания'))
 
 
 @app.route('/results')
 @login_required
 def back_results():
     return render_template('results.html', **generate_data_for_base('/results',
-                                                                    'Результаты экзаменов'))
+                                                                    'Результаты вступительных испытаний'))
 
 
 @app.route('/contacts', methods=['GET'])

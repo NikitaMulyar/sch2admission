@@ -30,11 +30,16 @@ def write_email(email, text, subj):
 def generate_and_send_password(email, name, surname):
     psw_str = '23456789QWERTYUPASDFGHJKZXCVBNM'
     psw = "".join(random.choices(psw_str, k=8))
-    email_text = (f'<h3>Уважаемый(-ая) {name} {surname}!<br>'
-                  f'Ваш пароль от личного кабинета на сайте приемной кампании Лицея "Вторая Школа":</h3>'
-                  f'<h2>{psw}</h2>'
-                  f'<h4>Если вы не регистрировались на этом сайте, ПРОИГНОРИРУЙТЕ это письмо!</h4>')
-    write_email(email, email_text, 'Пароль от аккаунта на sch2admission.ru')
+    email_text = (f'<h2>Уважаемый(-ая) {name} {surname}!</h2>'
+                  f'Ваша анкета для поступающих в Лицей "Вторая Школа" получена. Мы проверим Ваши данные и в течение '
+                  f'трех рабочих дней отправим Вам письмо о статусе заявки.<br>'
+                  f'Ваш пароль от личного кабинета на сайте приемной кампании Лицея "Вторая Школа":'
+                  f'<h3>{psw}</h3>'
+                  f'Если Вы не подавали заявку на поступление, сообщите нам об этом по электронной почте: '
+                  f'<a href="mailto:abitur@sch2.ru">abitur@sch2.ru</a>.<br><br>'
+                  f'С уважением,<br>'
+                  f'Лицей "Вторая Школа"')
+    write_email(email, email_text, 'Заявка на участие во вступительных испытаниях в Лицей "Вторая Школа"')
     return psw
 
 
@@ -80,7 +85,7 @@ def register_user(request: request, form: RegisterFormClasses8To11):
     uid = str(user.id)
     new_notif = Notification(
         user_id=user.id,
-        text='На вашу почту выслано письмо с паролем от личного кабинета. Проверьте папку "Спам".',
+        text='На Вашу почту выслано письмо с паролем от личного кабинета. Проверьте папку "Спам".',
         type='system'
     )
     new_notif.set_str_date()
@@ -110,7 +115,7 @@ def register_admin(form: RegisterFormAdmins):
     uid = str(user.id)
     new_notif = Notification(
         user_id=user.id,
-        text='На вашу почту выслано письмо с паролем от личного кабинета. Проверьте папку "Спам".',
+        text='На Вашу почту выслано письмо с паролем от личного кабинета. Проверьте папку "Спам".',
         type='system'
     )
     new_notif.set_str_date()
@@ -156,7 +161,7 @@ def reset_password(user_id):
     user.set_password(psw)
     new_notif = Notification(
         user_id=user_id,
-        text=f'Пароль сброшен и выслан на вашу эл. почту. Вы авторизованы как {user.email}.',
+        text=f'Пароль сброшен и выслан на Вашу эл. почту. Вы авторизованы как {user.email}.',
         type='system'
     )
     new_notif.set_str_date()
@@ -171,12 +176,15 @@ def generate_and_send_recover_link(email, name, surname, user_id):
     code = "".join(random.choices(s, k=64))
     recover_link = f'http://127.0.0.1:8080/recover/{code}'
 
-    email_text = (f'<h3>Уважаемый(-ая) {name} {surname}!<br>'
-                  f'Если вы делали запрос на восстановление пароля на сайте приемной кампании Лицея "Вторая Школа", '
-                  f'то перейдите по ссылке:</h3>'
-                  f'<h2><a href="{recover_link}">{recover_link}</a></h2>'
-                  f'<h4>Если вы не запрашивали восстановление пароля на этом сайте, ПРОИГНОРИРУЙТЕ это письмо!</h4>')
-    write_email(email, email_text, 'Восстановление пароля от аккаунта на sch2admission.ru')
+    email_text = (f'<h2>Уважаемый(-ая) {name} {surname}!</h2>'
+                  f'Для восстановление пароля от личного кабинета на сайте приемной кампании Лицея "Вторая Школа" '
+                  f'перейдите по ссылке:'
+                  f'<h3><a href="{recover_link}">{recover_link}</a></h3>'
+                  f'Если Вы не запрашивали восстановление пароля, ПРОИГНОРИРУЙТЕ это письмо!<br><br>'
+                  f'С уважением,<br>'
+                  f'Лицей "Вторая Школа"')
+    write_email(email, email_text, 'Восстановление пароля от личного кабинета на сайте приемной кампании Лицея '
+                                   '"Вторая Школа"')
     db_sess = db_session.create_session()
     rec = Recover(
         email=email,
@@ -185,7 +193,8 @@ def generate_and_send_recover_link(email, name, surname, user_id):
     db_sess.add(rec)
     notif = Notification(
         user_id=user_id,
-        text='На вашу почту выслано письмо с ссылкой для восстановления пароля от личного кабинета. Проверьте папку "Спам".',
+        text='На Вашу почту выслано письмо с ссылкой для восстановления пароля от личного кабинета. Проверьте папку '
+             '"Спам".',
         type='system'
     )
     notif.set_str_date()

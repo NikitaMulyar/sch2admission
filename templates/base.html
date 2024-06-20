@@ -20,13 +20,15 @@
         {% else %}
             <a href="/" class="btn btn-primary" id="nav-buttons">Главная</a>
         {% endif %}
-        {% if "/contacts" == current %}
+        {% if not current_user.is_authenticated or current_user.is_authenticated and current_user.role != 'admin' %}
+            {% if "/contacts" == current %}
             <a href="/contacts" class="btn btn-primary active" aria-current="page" id="nav-buttons">Контакты</a>
-        {% else %}
-            <a href="/contacts" class="btn btn-primary" id="nav-buttons">Контакты</a>
+            {% else %}
+                <a href="/contacts" class="btn btn-primary" id="nav-buttons">Контакты</a>
+            {% endif %}
+            <a href="https://lycuz2.mskobr.ru/roditelyam/algoritm-postuplenia/profilnye-klassy#/html/body/div[2]/div[3]/div/div[2]/div/div[3]/div[1]/div/div/div[1]/div/div/div"
+               class="btn btn-primary" id="nav-buttons" target="_blank">Материалы для подготовки</a>
         {% endif %}
-        <a href="https://lycuz2.mskobr.ru/roditelyam/algoritm-postuplenia/profilnye-klassy#/html/body/div[2]/div[3]/div/div[2]/div/div[3]/div[1]/div/div/div[1]/div/div/div"
-           class="btn btn-primary" id="nav-buttons" target="_blank">Материалы для подготовки</a>
         {% if current_user.is_authenticated and current_user.role != 'admin' %}
             {% for page in pages %}
                 {% if page == current %}

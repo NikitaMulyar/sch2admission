@@ -23,7 +23,7 @@ class LoginForm(FlaskForm):
     email = EmailField('Введите адрес эл. почты', validators=[DataRequired('Обязательное поле')],
                        description='Укажите адрес, указанный при регистрации.')
     password = PasswordField('Введите пароль', validators=[DataRequired('Обязательное поле')],
-                             description='Пароль был выслан после регистрации на указанную вами эл. почту. Проверьте папку "Спам".')
+                             description='Пароль был выслан после регистрации на указанную Вами эл. почту. Проверьте папку "Спам".')
     remember_me = BooleanField('Запомнить меня')
     submit = SubmitField('Войти')
 
@@ -31,7 +31,7 @@ class LoginForm(FlaskForm):
 class RegisterFormClasses6To7(FlaskForm):
     email = EmailField('Введите адрес эл. почты', validators=[DataRequired('Обязательное поле')],
                        description='В дальнейшем он будет использоваться для связи, отправления приглашений и входа на сайт. '
-                                   'После заполнения формы на него придет пароль от вашего личного кабинета')
+                                   'После заполнения формы на него придет пароль от Вашего личного кабинета')
     surname = StringField('Введите фамилию поступающего', validators=[DataRequired('Обязательное поле')])
     name = StringField('Введите имя поступающего', validators=[DataRequired('Обязательное поле')])
     third_name = StringField('Введите отчество поступающего', validators=[DataRequired('Обязательное поле')])
@@ -40,11 +40,11 @@ class RegisterFormClasses6To7(FlaskForm):
                                description='Нажмите на поле, чтобы выбрать класс')
     birth_date = DateField('Введите дату рождения поступающего',
                            validators=[InputRequired('Указана некорректная дата')])
-    school = StringField('Введите номер или название школы, в которой сейчас учится ребенок',
+    school = StringField('Введите номер или название школы, в которой сейчас учится поступающий',
                          validators=[DataRequired('Обязательное поле')])
-    about = TextAreaField('Напишите о своих успехах и достижениях за этот учебный год (олимпиады, конкурсы и др.)',
+    about = TextAreaField('Напишите об успехах и достижениях ребенка за этот учебный год (олимпиады, конкурсы и др.)',
                           validators=[Optional()], description='Необязательное поле')
-    family_friends_in_l2sh = TextAreaField('Если кто-то из родственников учился или учится в Лицее, вы можете написать '
+    family_friends_in_l2sh = TextAreaField('Если кто-то из родственников учился или учится в Лицее, Вы можете написать '
                                            'об этом здесь', validators=[Optional()], description='Необязательное поле')
     parent_surname = StringField('Введите фамилию родителя', validators=[DataRequired('Обязательное поле')])
     parent_name = StringField('Введите имя родителя', validators=[DataRequired('Обязательное поле')])
@@ -58,10 +58,10 @@ class RegisterFormClasses6To7(FlaskForm):
 
 
 class RegisterFormClasses8To11(RegisterFormClasses6To7):
-    class_number = SelectField('Выберите класс, в который вы ПОСТУПАЕТЕ', choices=["8", "9", "10", "11"],
+    class_number = SelectField('Выберите класс, в который ПОСТУПАЕТ ребенок', choices=["8", "9", "10", "11"],
                                validators=[DataRequired('Обязательное поле')],
                                description='Нажмите на поле, чтобы выбрать класс')
-    profile = SelectField('Выберите профиль, в который вы хотите поступить',
+    profile = SelectField('Выберите профиль, в который Вы хотите поступить',
                           choices=["Физический", "Математический", "Математико-программистский",
                                    "Математико-экономический"], validators=[DataRequired('Обязательное поле')],
                           description='Нажмите на поле, чтобы выбрать профиль')
@@ -69,14 +69,14 @@ class RegisterFormClasses8To11(RegisterFormClasses6To7):
 
 class RegisterFormAdmins(FlaskForm):
     email = EmailField('Введите адрес эл. почты', validators=[DataRequired('Обязательное поле')],
-                       description='По возможности нужно указать лицейскую почту. После заполнения формы на него придет пароль от вашего личного кабинета')
-    surname = StringField('Введите вашу фамилию', validators=[DataRequired('Обязательное поле')])
-    name = StringField('Введите ваше имя', validators=[DataRequired('Обязательное поле')])
-    third_name = StringField('Введите ваше отчество', validators=[DataRequired('Обязательное поле')])
+                       description='По возможности нужно указать лицейскую почту. После заполнения формы на него придет пароль от Вашего личного кабинета')
+    surname = StringField('Введите Вашу фамилию', validators=[DataRequired('Обязательное поле')])
+    name = StringField('Введите Ваше имя', validators=[DataRequired('Обязательное поле')])
+    third_name = StringField('Введите Ваше отчество', validators=[DataRequired('Обязательное поле')])
     submit = SubmitField('Продолжить')
 
 
 class RecoverForm(FlaskForm):
-    email = EmailField('Введите адрес эл. почты, на который вы регистрировались',
+    email = EmailField('Введите адрес эл. почты, на который Вы регистрировались',
                        validators=[DataRequired('Обязательное поле')])
     submit = SubmitField('Получить код')
