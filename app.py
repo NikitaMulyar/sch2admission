@@ -1,3 +1,5 @@
+import datetime
+
 from flask import Flask, render_template, request, redirect, abort, make_response
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 
@@ -172,11 +174,28 @@ def back_recover(code):
 
     db_sess = db_session.create_session()
     rec_code_exist = db_sess.query(Recover).where(Recover.code == code).first()
+
     if not rec_code_exist:
         db_sess.close()
         abort(404)
 
     user = db_sess.query(User).where(User.email == rec_code_exist.email).first()
+
+    if datetime.datetime.now() > rec_code_exist.expiration_date:
+        db_sess.delete(rec_code_exist)
+        resp = make_response(redirect('/recover/recover'))
+        resp.set_cookie("server_data", str(user.id), max_age=60 * 60 * 24 * 365)
+        notif = Notification(
+            user_id=user.id,
+            text=f'Срок действия ссылки истек. Необходимо заново заполнить форму восстановления пароля.',
+            type='warn'
+        )
+        notif.set_str_date()
+        db_sess.add(notif)
+        db_sess.commit()
+        db_sess.close()
+        return resp
+
     res = reset_password(user.id)
     attempts = 3
     while res == -1 and attempts > 0:
@@ -207,7 +226,21 @@ def back_recover(code):
 @app.route('/lk')
 @login_required
 def back_cabinet():
-    return render_template('cabinet.html', **generate_data_for_base('/lk', 'Личный кабинет'))
+    statuses = json.load(open('py_scripts/consts/contest_statuses.json', mode='rb'))
+
+    data = [
+        ("Статус участия", statuses[current_user.status], current_user.status),
+        ("Эл. почта", current_user.email),
+        ("Поступающий", f"{current_user.surname} {current_user.name} {current_user.third_name}"),
+        ("Поступает в", f"{current_user.class_number} "
+                        f"{current_user.profile_10_11.lower() if current_user.class_number >= 10 else ''} класс"),
+        ("Школа", current_user.school),
+        ("Родитель", f"{current_user.parent_surname} {current_user.parent_name} {current_user.parent_third_name}"),
+        ("Телефон", current_user.parent_phone_number),
+        ("О себе", current_user.about if current_user.about else '-')
+    ]
+    return render_template('cabinet.html', **generate_data_for_base('/lk', 'Личный кабинет'),
+                           data=data)
 
 
 @app.route('/invites')

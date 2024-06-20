@@ -1,34 +1,29 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2 class="h2-style"><b>Личный кабинет</b></h2><br>
-    <table class="table">
-        <thead>
-        <tr>
-            <th scope="col">#</th>
-            <th scope="col">First</th>
-            <th scope="col">Last</th>
-            <th scope="col">Handle</th>
-        </tr>
-        </thead>
+    <h2 class="h2-style"><b>Личная информация</b></h2><br>
+    <table class="table table-bordered">
         <tbody>
+        {% for row in data %}
         <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
+            <th scope="row" style="width: 30%">{{ row[0] }}</th>
+            {% if loop.index == 1 %}
+                {% set cls = "secondary" %}
+                {% if row[2] == "3" %}
+                    {% set cls = "warning" %}
+                {% elif row[2] == "2" %}
+                    {% set cls = "success" %}
+                {% elif row[2] == "1" or row[2] == "5" %}
+                    {% set cls = "danger" %}
+                {% elif row[2] == "0" %}
+                    {% set cls = "primary" %}
+                {% endif %}
+                <td class="table-{{ cls }}">{{ row[1] }}</td>
+            {% else %}
+                <td>{{ row[1] }}</td>
+            {% endif %}
         </tr>
-        <tr>
-            <th scope="row">2</th>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-        </tr>
-        <tr>
-            <th scope="row">3</th>
-            <td colspan="2">Larry the Bird</td>
-            <td>@twitter</td>
-        </tr>
+        {% endfor %}
         </tbody>
     </table>
 {% endblock %}

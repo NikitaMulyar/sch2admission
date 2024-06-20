@@ -92,9 +92,8 @@
                     {{ notif.text }}<br>
                     <small class="text-body-secondary">{{ notif.made_on_str }}</small>
                     <div class="mt-2 pt-2 border-top">
-                        {% if notif.type != 'system' %}
-                            <button type="button" class="btn btn-dark btn-sm"><a href="{{ notif.link }}">Показать</a>
-                            </button>
+                        {% if notif.type != 'system' and notif.type != 'warn' %}
+                            <button type="button" class="btn btn-dark btn-sm" href="{{ notif.link }}">Показать</button>
                         {% endif %}
                         <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="toast">Позже</button>
                     </div>
