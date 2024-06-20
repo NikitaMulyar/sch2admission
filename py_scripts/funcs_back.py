@@ -46,7 +46,8 @@ def register_user(request: request, form: RegisterFormClasses8To11):
 
     uploaded_file = request.files['photo']
     type_ = uploaded_file.filename.split('.')[-1]
-    file_path = os.path.join('abitur_data', 'photos', f'{form.surname.data}_{form.name.data}_{form.third_name.data}.{type_}')
+    file_path = os.path.join('abitur_data', 'photos',
+                             f'{form.surname.data}_{form.name.data}_{form.third_name.data}.{type_}')
     uploaded_file.save(file_path)
     try:
         prof = form.profile.data

@@ -9,9 +9,9 @@ from sa_models.recovers import Recover
 import json
 from py_scripts.forms import (RegisterFormClasses6To7, RegisterFormClasses8To11, LoginForm, RecoverForm,
                               RegisterFormAdmins)
-from py_scripts.funcs_back import (register_user, generate_data_for_base, generate_and_send_recover_link, reset_password,
+from py_scripts.funcs_back import (register_user, generate_data_for_base, generate_and_send_recover_link,
+                                   reset_password,
                                    register_admin)
-
 
 app = Flask(__name__)
 db_session.global_init('database/admission.db')

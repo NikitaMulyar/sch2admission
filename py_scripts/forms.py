@@ -38,7 +38,8 @@ class RegisterFormClasses6To7(FlaskForm):
     class_number = SelectField('Выберите класс, в который ПОСТУПАЕТ ребенок', choices=["6", "7"],
                                validators=[DataRequired('Обязательное поле')],
                                description='Нажмите на поле, чтобы выбрать класс')
-    birth_date = DateField('Введите дату рождения поступающего', validators=[InputRequired('Указана некорректная дата')])
+    birth_date = DateField('Введите дату рождения поступающего',
+                           validators=[InputRequired('Указана некорректная дата')])
     school = StringField('Введите номер или название школы, в которой сейчас учится ребенок',
                          validators=[DataRequired('Обязательное поле')])
     about = TextAreaField('Напишите о своих успехах и достижениях за этот учебный год (олимпиады, конкурсы и др.)',
@@ -48,8 +49,9 @@ class RegisterFormClasses6To7(FlaskForm):
     parent_surname = StringField('Введите фамилию родителя', validators=[DataRequired('Обязательное поле')])
     parent_name = StringField('Введите имя родителя', validators=[DataRequired('Обязательное поле')])
     parent_third_name = StringField('Введите отчество родителя', validators=[DataRequired('Обязательное поле')])
-    parent_phone_number = TelField('Введите номер телефона родителя', validators=[TelNumberValidator('Неверный формат номера'),
-                                                                                  DataRequired()])
+    parent_phone_number = TelField('Введите номер телефона родителя',
+                                   validators=[TelNumberValidator('Неверный формат номера'),
+                                               DataRequired()])
     photo = FileField('Прикрепите фото поступающего', validators=[FileRequired('Обязательное поле'),
                                                                   FileAllowed(['png', 'jpg', 'jpeg', 'heic'])])
     submit = SubmitField('Продолжить')
