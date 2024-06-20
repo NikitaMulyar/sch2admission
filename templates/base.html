@@ -42,18 +42,18 @@
             {% endif %}
         {% endfor %}
     {% else %}
-        {% if exams_on["6-9"] %}
-            {% if "/register/6-9" == current %}
-                <a href="/register/6-9" class="btn btn-primary active" aria-current="page" id="nav-buttons">Регистрация на экзамены в 6, 7, 8, 9 классы</a>
+        {% if exams_on["6-7"] %}
+            {% if "/register/6-7" == current %}
+                <a href="/register/6-7" class="btn btn-primary active" aria-current="page" id="nav-buttons">Регистрация на экзамены в 6, 7 классы</a>
             {% else %}
-                <a href="/register/6-9" class="btn btn-primary" id="nav-buttons">Регистрация на экзамены в 6, 7, 8, 9 классы</a>
+                <a href="/register/6-7" class="btn btn-primary" id="nav-buttons">Регистрация на экзамены в 6, 7 классы</a>
             {% endif %}
         {% endif %}
-        {% if exams_on["10-11"] %}
-            {% if "/register/10-11" == current %}
-                <a href="/register/10-11" class="btn btn-primary active" aria-current="page" id="nav-buttons">Регистрация на экзамены в 10, 11 классы</a>
+        {% if exams_on["8-11"] %}
+            {% if "/register/8-11" == current %}
+                <a href="/register/8-11" class="btn btn-primary active" aria-current="page" id="nav-buttons">Регистрация на экзамены в 8, 9, 10, 11 классы</a>
             {% else %}
-                <a href="/register/10-11" class="btn btn-primary" id="nav-buttons">Регистрация на экзамены в 10, 11 классы</a>
+                <a href="/register/8-11" class="btn btn-primary" id="nav-buttons">Регистрация на экзамены в 8, 9, 10, 11 классы</a>
             {% endif %}
         {% endif %}
         {% if "/login" == current %}

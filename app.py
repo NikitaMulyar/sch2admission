@@ -7,7 +7,7 @@ from sa_models.users import User
 from sa_models.recovers import Recover
 
 import json
-from py_scripts.forms import (RegisterFormClasses6To9, RegisterFormClasses10To11, LoginForm, RecoverForm,
+from py_scripts.forms import (RegisterFormClasses6To7, RegisterFormClasses8To11, LoginForm, RecoverForm,
                               RegisterFormAdmins)
 from py_scripts.funcs_back import (register_user, generate_data_for_base, generate_and_send_recover_link, reset_password,
                                    register_admin)
@@ -113,13 +113,11 @@ def back_register(classes):
         return render_template('admin_register.html', form=form,
                                **generate_data_for_base(f'/register/{classes}', title))
 
-    title = 'Регистрация на вступительные испытания в 6, 7, 8, 9 классы'
-    if classes == '10-11':
-        title = 'Регистрация на вступительные испытания в 10, 11 классы'
-    if classes == '6-9':
-        form = RegisterFormClasses6To9()
-    else:
-        form = RegisterFormClasses10To11()
+    title = 'Регистрация на вступительные испытания в 6, 7 классы'
+    form = RegisterFormClasses6To7()
+    if classes == '8-11':
+        title = 'Регистрация на вступительные испытания в 8, 9, 10, 11 классы'
+        form = RegisterFormClasses8To11()
 
     if form.validate_on_submit():
         db_sess = db_session.create_session()

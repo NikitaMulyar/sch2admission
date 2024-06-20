@@ -28,14 +28,14 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Войти')
 
 
-class RegisterFormClasses6To9(FlaskForm):
+class RegisterFormClasses6To7(FlaskForm):
     email = EmailField('Введите адрес эл. почты', validators=[DataRequired('Обязательное поле')],
                        description='В дальнейшем он будет использоваться для связи, отправления приглашений и входа на сайт. '
                                    'После заполнения формы на него придет пароль от вашего личного кабинета')
     surname = StringField('Введите фамилию поступающего', validators=[DataRequired('Обязательное поле')])
     name = StringField('Введите имя поступающего', validators=[DataRequired('Обязательное поле')])
     third_name = StringField('Введите отчество поступающего', validators=[DataRequired('Обязательное поле')])
-    class_number = SelectField('Выберите класс, в который ПОСТУПАЕТ ребенок', choices=["6", "7", "8", "9"],
+    class_number = SelectField('Выберите класс, в который ПОСТУПАЕТ ребенок', choices=["6", "7"],
                                validators=[DataRequired('Обязательное поле')],
                                description='Нажмите на поле, чтобы выбрать класс')
     birth_date = DateField('Введите дату рождения поступающего', validators=[InputRequired('Указана некорректная дата')])
@@ -55,8 +55,8 @@ class RegisterFormClasses6To9(FlaskForm):
     submit = SubmitField('Продолжить')
 
 
-class RegisterFormClasses10To11(RegisterFormClasses6To9):
-    class_number = SelectField('Выберите класс, в который вы ПОСТУПАЕТЕ', choices=["10", "11"],
+class RegisterFormClasses8To11(RegisterFormClasses6To7):
+    class_number = SelectField('Выберите класс, в который вы ПОСТУПАЕТЕ', choices=["8", "9", "10", "11"],
                                validators=[DataRequired('Обязательное поле')],
                                description='Нажмите на поле, чтобы выбрать класс')
     profile = SelectField('Выберите профиль, в который вы хотите поступить',

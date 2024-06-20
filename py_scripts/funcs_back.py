@@ -4,7 +4,7 @@ from email.mime.text import MIMEText
 import phonenumbers
 from flask import request, url_for
 from flask_login import current_user, login_user
-from py_scripts.forms import RegisterFormClasses10To11, RegisterFormAdmins
+from py_scripts.forms import RegisterFormClasses8To11, RegisterFormAdmins
 from sa_models.users import User
 from sa_models.notifications import Notification
 from sa_models.recovers import Recover
@@ -38,7 +38,7 @@ def generate_and_send_password(email, name, surname):
     return psw
 
 
-def register_user(request: request, form: RegisterFormClasses10To11):
+def register_user(request: request, form: RegisterFormClasses8To11):
     try:
         psw = generate_and_send_password(form.email.data, form.name.data, form.surname.data)
     except Exception:

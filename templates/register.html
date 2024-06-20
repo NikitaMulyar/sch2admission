@@ -91,18 +91,20 @@
             </div>
         {% endfor %}
     </p>
-    {% if form.profile %}
-        <p>
-            {{ form.profile.label }}
-            <div class="description_form">{{ form.profile.description }}</div>
-            {{ form.profile(class="form-control") }}
-            {% for error in form.profile.errors %}
-                <p class="alert alert-danger" role="alert">
-                    {{ error }}
-                </p>
-            {% endfor %}
-        </p>
-    {% endif %}
+    <div id="myProfile">
+        {% if form.profile %}
+            <p>
+                {{ form.profile.label }}
+                <div class="description_form">{{ form.profile.description }}</div>
+                {{ form.profile(class="form-control") }}
+                {% for error in form.profile.errors %}
+                    <p class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                {% endfor %}
+            </p>
+        {% endif %}
+    </div>
     <p>
         {{ form.birth_date.label }}
         <div class="description_form">{{ form.birth_date.description }}</div>
