@@ -6,7 +6,10 @@ from py_scripts.pages import Pages
 from py_scripts.auth_class import AuthClass
 from sa_models import db_session
 from sa_models.users import User
+import ssl
 
+
+ssl._create_default_https_context = ssl._create_unverified_context
 
 app_fl = Flask(__name__)
 db_session.global_init('database/admission.db')

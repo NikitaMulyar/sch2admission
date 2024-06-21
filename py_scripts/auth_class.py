@@ -148,7 +148,8 @@ class AuthClass:
                         resp.set_cookie("server_data", str(user_exist.id), max_age=60 * 60 * 24 * 365)
                         db_sess.close()
                         return resp
-                    except Exception:
+                    except Exception as e:
+                        print(e)
                         form.email.errors.append(
                             'Не получилось отправить письмо с ссылкой для восстановления пароля на указанную почту.')
                     db_sess.close()

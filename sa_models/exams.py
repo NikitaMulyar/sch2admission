@@ -10,6 +10,7 @@ class Exam(SqlAlchemyBase):
     title = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     number = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     time = sqlalchemy.Column(sqlalchemy.DateTime, nullable=True)
+    duration_minutes = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
 
     invites = orm.relationship("Invite", back_populates="parent_exam", cascade="all, delete")
 
