@@ -1,9 +1,12 @@
 from flask_wtf import FlaskForm
 from wtforms import EmailField, PasswordField, SubmitField, BooleanField, StringField, FileField, \
-    DateField, TextAreaField, SelectField, TelField
+    DateField, TextAreaField, SelectField, TelField, DateTimeLocalField
 from wtforms.validators import DataRequired, Optional, InputRequired, ValidationError
 from flask_wtf.file import FileAllowed, FileRequired
 import phonenumbers
+
+import json
+from markupsafe import Markup
 
 
 class TelNumberValidator:
@@ -62,8 +65,8 @@ class RegisterFormClasses8To11(RegisterFormClasses6To7):
                                validators=[DataRequired('Обязательное поле')],
                                description='Нажмите на поле, чтобы выбрать класс')
     profile = SelectField('Выберите профиль, в который Вы хотите поступить',
-                          choices=["Физический", "Математический", "Математико-программистский",
-                                   "Математико-экономический"], validators=[DataRequired('Обязательное поле')],
+                          choices=json.load(open("py_scripts/consts/profiles.json")),
+                          validators=[DataRequired('Обязательное поле')],
                           description='Нажмите на поле, чтобы выбрать профиль')
 
 
@@ -80,3 +83,21 @@ class RecoverForm(FlaskForm):
     email = EmailField('Введите адрес эл. почты, на который Вы регистрировались',
                        validators=[DataRequired('Обязательное поле')])
     submit = SubmitField('Получить код')
+
+
+class ExamCreateForm(FlaskForm):
+    title = StringField('Введите название экзамена', validators=[DataRequired('Обязательное поле')])
+    date = DateTimeLocalField('Выберите дату и время начала экзамена', validators=[DataRequired('Обязательное поле')])
+    class_number = SelectField('Выберите класс', choices=["6", "7", "8", "9", "10", "11"],
+                               validators=[DataRequired('Обязательное поле')],
+                               description='Нажмите на поле, чтобы выбрать класс')
+    profile = SelectField('Выберите для какого профиля экзамен',
+                          choices=json.load(open("py_scripts/consts/profiles.json")),
+                          validators=[DataRequired('Обязательное поле')],
+                          description='Нажмите на поле, чтобы выбрать профиль')
+    exam_description = TextAreaField('Введите описание экзамена',
+                                     description=Markup('Для использования форматирования текста применяйте Markdown: '
+                                                        '<a target="_blank" href="https://www.markdownguide.org/basic-syntax/'
+                                                        '#emphasis">Пример</a>'),
+                                     validators=[DataRequired('Обязательное поле')])
+    submit = SubmitField('Создать экзамен')

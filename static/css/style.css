@@ -1,12 +1,47 @@
-/*@font-face {
-    font-family: 'MyWebFont';
-    src: url('static/fonts/sf_regular.ttf')  format('truetype'),
-         url('static/fonts/sf_bold.ttf')  format('truetype'),
-         url('static/fonts/sf_bold_italic.ttf')  format('truetype'),
-         url('static/fonts/sf_regular_italic.ttf')  format('truetype');
-}*/
+@font-face {
+    font-family: MyWebFont;
+    font-style: normal;
+    font-weight: 500;
+    src: url(/static/fonts/MuseoSansCyrl-500.ttf);
+}
+
+@font-face {
+    font-family: MyWebFont;
+    font-style: italic;
+    font-weight: 500;
+    src: url(/static/fonts/MuseoSansCyrl-500Italic.ttf);
+}
+
+@font-face {
+    font-family: MyWebFont;
+    font-style: normal;
+    font-weight: 700;
+    src: url(/static/fonts/MuseoSansCyrl-700.ttf);
+}
+
+@font-face {
+    font-family: MyWebFont;
+    font-style: italic;
+    font-weight: 700;
+    src: url(/static/fonts/MuseoSansCyrl-700Italic.ttf);
+}
+
+@font-face {
+    font-family: MyWebFont;
+    font-style: normal;
+    font-weight: 900;
+    src: url(/static/fonts/MuseoSansCyrl-900.ttf);
+}
+
+@font-face {
+    font-family: MyWebFont;
+    font-style: italic;
+    font-weight: 900;
+    src: url(/static/fonts/MuseoSansCyrl-900Italic.ttf);
+}
 
 #base-style{
+    font-family: MyWebFont, serif;
     padding-top: 20px;
     background: #eae7dc;
     font-size: 18px;
@@ -45,4 +80,8 @@
 .description_form{
     font-size: 14px !important;
     margin-top: -18px;
+}
+
+tr.spaceUnder>td {
+  padding-bottom: 20px;
 }
