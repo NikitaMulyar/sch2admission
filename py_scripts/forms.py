@@ -8,6 +8,9 @@ import phonenumbers
 import json
 from markupsafe import Markup
 
+from sa_models import db_session
+from sa_models.exams import Exam
+
 
 class TelNumberValidator:
     def __init__(self, message='Ошибка'):
@@ -86,7 +89,11 @@ class RecoverForm(FlaskForm):
 
 
 class ExamCreateForm(FlaskForm):
-    title = StringField('Введите название экзамена', validators=[DataRequired('Обязательное поле')])
+    title = SelectField('Выберите название экзамена', validators=[DataRequired('Обязательное поле')],
+                        description='Нажмите на поле, чтобы выбрать название. Если нет подходящих вариантов, выберите '
+                                    '"Другое". В самый первый экзамен эта опция будет выбрана автоматически.',
+                        choices=[])
+    new_title = StringField('Введите название экзамена')
     date = DateTimeLocalField('Выберите дату и время начала экзамена', validators=[DataRequired('Обязательное поле')])
     class_number = SelectField('Выберите класс', choices=["6", "7", "8", "9", "10", "11"],
                                validators=[DataRequired('Обязательное поле')],
@@ -101,3 +108,23 @@ class ExamCreateForm(FlaskForm):
                                                         '#emphasis">Пример</a>'),
                                      validators=[DataRequired('Обязательное поле')])
     submit = SubmitField('Создать экзамен')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        db_sess = db_session.create_session()
+        titles = sorted([i[0] for i in db_sess.query(Exam.title.distinct()).all()])
+        db_sess.close()
+        self.title.choices = titles + ['Другое']
+
+
+class ExamStatusesForm(FlaskForm):
+    exams_6_7 = BooleanField('Статус регистрации на экзамены в 6, 7 классы')
+    exams_8_11 = BooleanField('Статус регистрации на экзамены в 8, 9, 10, 11 классы')
+    submit = SubmitField('Подтвердить')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.validate_on_submit():
+            exs = json.load(open('py_scripts/consts/registration_status.json', mode='rb'))
+            self.exams_6_7.data = exs['6-7']
+            self.exams_8_11.data = exs['8-11']

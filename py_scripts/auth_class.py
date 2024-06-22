@@ -48,6 +48,14 @@ class AuthClass:
                 form.password.errors.append('Неверный пароль. Забыли пароль?')
             else:
                 login_user(user_exist, remember=form.remember_me.data)
+                new_notif = Notification(
+                    user_id=current_user.id,
+                    text='Добро пожаловать!',
+                    type='system'
+                )
+                new_notif.set_str_date()
+                db_sess.add(new_notif)
+                db_sess.commit()
                 db_sess.close()
                 return redirect('/')
         resp = make_response(render_template('login.html', form=form,

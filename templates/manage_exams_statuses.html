@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2 class="h2-style"><b>Авторизация</b></h2><br>
+    <h2 class="h2-style"><b>Настройка регистрации на вступительные испытания</b></h2><br>
     <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
         <symbol id="check-circle-fill" viewBox="0 0 16 16">
             <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
@@ -27,37 +27,10 @@
                 </div>
             </div>
         {% endif %}
-        <p>
-            {{ form.email.label }}
-        <div class="description_form">{{ form.email.description }}</div>
-        {{ form.email(class="form-control", type="email", **{"placeholder": "example@example.com"}) }}
-        {% for error in form.email.errors %}
-            <div class="alert alert-danger d-flex align-items-center" role="alert" style="margin-top: 5px !important;">
-                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
-                    <use xlink:href="#exclamation-triangle-fill"/>
-                </svg>
-                <div>
-                    {{ error }}
-                </div>
-            </div>
-        {% endfor %}
-        </p>
-        <p>
-            {{ form.password.label }}
-        <div class="description_form">{{ form.password.description }}</div>
-        {{ form.password(class="form-control", type="password") }}
-        {% for error in form.password.errors %}
-            <div class="alert alert-danger d-flex align-items-center" role="alert" style="margin-top: 5px !important;">
-                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
-                    <use xlink:href="#exclamation-triangle-fill"/>
-                </svg>
-                <div>
-                    <a href="/recover/recover">{{ error }}</a>
-                </div>
-            </div>
-        {% endfor %}
-        </p>
-        <p>{{ form.remember_me(class_="checkbox2") }} {{ form.remember_me.label }}</p>
+        <p>{{ form.exams_6_7(class_="checkbox", **{"id": "checkBox1"}) }} {{ form.exams_6_7.label }}:
+            <a id="checkBox1-text">ОТКРЫТА</a></p>
+        <p>{{ form.exams_8_11(class_="checkbox", **{"id": "checkBox2"}) }} {{ form.exams_8_11.label }}:
+            <a id="checkBox2-text">ОТКРЫТА</a></p>
         <p>{{ form.submit(type="submit", class="btn btn-success", **{"id": "myBtn"}) }}</p>
         <div class="collapse" id="collapseExample">
             <div class="card card-body"
@@ -71,5 +44,5 @@
             </div>
         </div>
     </form>
-    <script src="/static/js/login.js"></script>
+    <script src="/static/js/manage_exams.js"></script>
 {% endblock %}

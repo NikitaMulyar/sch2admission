@@ -160,6 +160,7 @@ def generate_data_for_base(current='/', title='Главная', user_id=''):
         for notif in d['notifications']:
             db_sess.delete(notif)
     db_sess.commit()
+    d['application_number'] = db_sess.query(User).where(User.status == "4").count()
     db_sess.close()
     return d
 

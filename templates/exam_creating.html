@@ -39,6 +39,21 @@
             </div>
         {% endfor %}
     </p>
+    <div id="other-title">
+        <p>
+            {{ form.new_title.label }}
+            <div class="description_form">{{ form.new_title.description }}</div>
+            {{ form.new_title(class="form-control") }}
+            {% for error in form.new_title.errors %}
+                     <div class="alert alert-danger d-flex align-items-center" role="alert" style="margin-top: 5px !important;">
+                  <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+                  <div>
+                    {{ error }}
+                  </div>
+                </div>
+            {% endfor %}
+        </p>
+    </div>
     <p>
         {{ form.date.label }}
         <div class="description_form">{{ form.date.description }}</div>
@@ -83,7 +98,7 @@
     <p>
         {{ form.exam_description.label }}
         <div class="description_form">{{ form.exam_description.description|safe }}</div>
-        {{ form.exam_description(class="form-control") }}
+        {{ form.exam_description(class="form-control", rows="5") }}
         {% for error in form.exam_description.errors %}
                 <div class="alert alert-danger d-flex align-items-center" role="alert" style="margin-top: 5px !important;">
               <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
@@ -93,7 +108,7 @@
             </div>
         {% endfor %}
     </p>
-    <p>{{ form.submit(type="submit", class="btn btn-success", **{"id": "myBtn", "onclick": "myScript();"}) }}</p>
+    <p>{{ form.submit(type="submit", class="btn btn-success", **{"id": "myBtn"}) }}</p>
     <div class="collapse" id="collapseExample">
       <div class="card card-body" style="display: flex !important;  flex-direction: row  !important;  justify-content: flex-start  !important;">
           <div class="spinner-border text-primary" role="status">

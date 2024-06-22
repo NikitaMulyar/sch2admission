@@ -22,7 +22,7 @@
         {% endif %}
         {% if not current_user.is_authenticated or current_user.is_authenticated and current_user.role != 'admin' %}
             {% if "/contacts" == current %}
-            <a href="/contacts" class="btn btn-primary active" aria-current="page" id="nav-buttons">Контакты</a>
+                <a href="/contacts" class="btn btn-primary active" aria-current="page" id="nav-buttons">Контакты</a>
             {% else %}
                 <a href="/contacts" class="btn btn-primary" id="nav-buttons">Контакты</a>
             {% endif %}
@@ -44,7 +44,18 @@
                     <a href="{{ page }}" class="btn btn-primary active" aria-current="page"
                        id="nav-buttons">{{ admin_pages[page] }}</a>
                 {% else %}
-                    <a href="{{ page }}" class="btn btn-primary" id="nav-buttons">{{ admin_pages[page] }}</a>
+                    <a href="{{ page }}" class="btn btn-primary position-relative" id="nav-buttons">{{ admin_pages[page] }}
+                        {% if page == '/applications' and application_number != 0 %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {% if application_number > 999 %}
+                                    999+
+                                {% else %}
+                                    {{ application_number }}
+                                {% endif %}
+                                <span class="visually-hidden">Есть нерассмотренные заявки</span>
+                            </span>
+                        {% endif %}
+                    </a>
                 {% endif %}
             {% endfor %}
         {% else %}

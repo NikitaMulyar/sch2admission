@@ -75,6 +75,7 @@
 
 #nav-buttons{
     margin: 5px;
+    font-size: 16px !important;
 }
 
 .description_form{
@@ -84,4 +85,18 @@
 
 tr.spaceUnder>td {
   padding-bottom: 20px;
+}
+
+#myBtn {
+    font-size: 18px !important;
+}
+
+.checkbox {
+    height: 22px !important;
+    width: 22px !important;
+}
+
+.checkbox2 {
+    height: 16px !important;
+    width: 16px !important;
 }

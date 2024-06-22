@@ -5,7 +5,7 @@ from py_scripts.funcs_back import generate_data_for_base
 from sa_models import db_session
 from sa_models.exams import Exam
 from sa_models.notifications import Notification
-from py_scripts.forms import ExamCreateForm
+from py_scripts.forms import ExamCreateForm, ExamStatusesForm
 
 from markupsafe import Markup
 
@@ -93,16 +93,11 @@ class Pages:
     @non_admin_forbidden
     def back_exams():
         db_sess = db_session.create_session()
-        exams = db_sess.query(Exam).order_by(Exam.date.desc(), Exam.for_class, Exam.profile_10_11, Exam.title).all()
-        exams_list = []
+        exams = db_sess.query(Exam).order_by(Exam.date.desc(), Exam.title, Exam.profile_10_11).all()
+        exams_list = {6: [], 7: [], 8: [], 9: [], 10: [], 11: []}
         for exam in exams:
-            arr = [exam.id, exam.title]
-            if exam.for_class >= 10:
-                arr.append(f'{exam.for_class} {exam.profile_10_11}')
-            else:
-                arr.append(exam.for_class)
-            arr.append(exam.date.strftime("%H:%M, %d.%m.%Y"))
-            exams_list.append(arr)
+            arr = [exam.id, exam.title, exam.profile_10_11, exam.date.strftime("%H:%M, %d.%m.%Y")]
+            exams_list[exam.for_class].append(arr)
         return render_template('exams.html', **generate_data_for_base('/exams',
                                                                         'Вступительные испытания'),
                                exams_list=exams_list)
@@ -115,29 +110,58 @@ class Pages:
             form = ExamCreateForm()
 
             if form.validate_on_submit():
-                profile = ''
-                if int(form.class_number.data) >= 10:
-                    profile = form.profile.data
-                exam = Exam(
-                    title=form.title.data,
-                    date=form.date.data,
-                    exam_description=form.exam_description.data,
-                    for_class=int(form.class_number.data),
-                    profile_10_11=profile
-                )
+                if form.title.data == 'Другое' and not form.new_title.data:
+                    form.new_title.errors.append('Обязательное поле')
+                else:
+                    profile = ''
+                    if int(form.class_number.data) >= 10:
+                        profile = form.profile.data
+                    title = form.title.data
+                    if title == 'Другое':
+                        title = form.new_title.data
+                    exam = Exam(
+                        title=title,
+                        date=form.date.data,
+                        exam_description=form.exam_description.data,
+                        for_class=int(form.class_number.data),
+                        profile_10_11=profile
+                    )
+                    notif = Notification(
+                        user_id=current_user.id,
+                        text=f'Экзамен "{title}" успешно создан!',
+                        type='system'
+                    )
+                    notif.set_str_date()
+                    db_sess = db_session.create_session()
+                    db_sess.add(exam)
+                    db_sess.add(notif)
+                    db_sess.commit()
+                    db_sess.close()
+                    return redirect('/exams')
+
+            return render_template('exam_creating.html', **generate_data_for_base('/exams/create',
+                                                                          'Создание нового вступительного испытания'),
+                                   form=form)
+        if exam_id == 'statuses':
+            form = ExamStatusesForm()
+            if form.validate_on_submit():
+                statuses = json.load(open('py_scripts/consts/registration_status.json', mode='rb'))
+                statuses['6-7'] = form.exams_6_7.data
+                statuses['8-11'] = form.exams_8_11.data
+                json.dump(statuses, open('py_scripts/consts/registration_status.json', mode='w'))
                 notif = Notification(
                     user_id=current_user.id,
-                    text=f'Экзамен "{form.title.data}" успешно создан!',
+                    text=f'Настройки регистрации успешно обновлены!',
                     type='system'
                 )
                 notif.set_str_date()
                 db_sess = db_session.create_session()
-                db_sess.add(exam)
                 db_sess.add(notif)
                 db_sess.commit()
                 db_sess.close()
                 return redirect('/exams')
-            return render_template('exam_creating.html', **generate_data_for_base('/exams/create',
-                                                                          'Создание нового вступительного испытания'),
+            return render_template('manage_exams_statuses.html',
+                                   **generate_data_for_base('/exams/statuses',
+                                                            'Настройка регистрации на вступительные испытания'),
                                    form=form)
         # МАТВЕЙ, ТУТ ТВОИ ОБРАБОТЧИКИ
