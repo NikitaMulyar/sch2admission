@@ -16,32 +16,32 @@
         <h1><b>Поступление в Лицей «Вторая Школа»</b></h1>
 
         {% if "/" == current %}
-            <a href="/" class="btn btn-primary active" aria-current="page" id="nav-buttons">Главная</a>
+            <a href="/" class="btn btn-primary active position-relative" aria-current="page" id="nav-buttons">Главная</a>
         {% else %}
-            <a href="/" class="btn btn-primary" id="nav-buttons">Главная</a>
+            <a href="/" class="btn btn-primary position-relative" id="nav-buttons">Главная</a>
         {% endif %}
         {% if not current_user.is_authenticated or current_user.is_authenticated and current_user.role != 'admin' %}
             {% if "/contacts" == current %}
-                <a href="/contacts" class="btn btn-primary active" aria-current="page" id="nav-buttons">Контакты</a>
+                <a href="/contacts" class="btn btn-primary active position-relative" aria-current="page" id="nav-buttons">Контакты</a>
             {% else %}
-                <a href="/contacts" class="btn btn-primary" id="nav-buttons">Контакты</a>
+                <a href="/contacts" class="btn btn-primary position-relative" id="nav-buttons">Контакты</a>
             {% endif %}
             <a href="https://lycuz2.mskobr.ru/roditelyam/algoritm-postuplenia/profilnye-klassy#/html/body/div[2]/div[3]/div/div[2]/div/div[3]/div[1]/div/div/div[1]/div/div/div"
-               class="btn btn-primary" id="nav-buttons" target="_blank">Материалы для подготовки</a>
+               class="btn btn-primary position-relative" id="nav-buttons" target="_blank">Материалы для подготовки</a>
         {% endif %}
         {% if current_user.is_authenticated and current_user.role != 'admin' %}
             {% for page in pages %}
                 {% if page == current %}
-                    <a href="{{ page }}" class="btn btn-primary active" aria-current="page"
+                    <a href="{{ page }}" class="btn btn-primary active position-relative" aria-current="page"
                        id="nav-buttons">{{ pages[page] }}</a>
                 {% else %}
-                    <a href="{{ page }}" class="btn btn-primary" id="nav-buttons">{{ pages[page] }}</a>
+                    <a href="{{ page }}" class="btn btn-primary position-relative" id="nav-buttons">{{ pages[page] }}</a>
                 {% endif %}
             {% endfor %}
         {% elif current_user.is_authenticated and current_user.role == 'admin' %}
             {% for page in admin_pages %}
                 {% if page == current %}
-                    <a href="{{ page }}" class="btn btn-primary active" aria-current="page"
+                    <a href="{{ page }}" class="btn btn-primary active position-relative" aria-current="page"
                        id="nav-buttons">{{ admin_pages[page] }}</a>
                 {% else %}
                     <a href="{{ page }}" class="btn btn-primary position-relative" id="nav-buttons">{{ admin_pages[page] }}
@@ -61,27 +61,27 @@
         {% else %}
             {% if exams_on["6-7"] %}
                 {% if "/register/6-7" == current %}
-                    <a href="/register/6-7" class="btn btn-primary active" aria-current="page" id="nav-buttons">Регистрация
+                    <a href="/register/6-7" class="btn btn-primary active position-relative" aria-current="page" id="nav-buttons">Регистрация
                         на экзамены в 6, 7 классы</a>
                 {% else %}
-                    <a href="/register/6-7" class="btn btn-primary" id="nav-buttons">Регистрация на экзамены в 6, 7
+                    <a href="/register/6-7" class="btn btn-primary position-relative" id="nav-buttons">Регистрация на экзамены в 6, 7
                         классы</a>
                 {% endif %}
             {% endif %}
             {% if exams_on["8-11"] %}
                 {% if "/register/8-11" == current %}
-                    <a href="/register/8-11" class="btn btn-primary active" aria-current="page" id="nav-buttons">Регистрация
+                    <a href="/register/8-11" class="btn btn-primary active position-relative" aria-current="page" id="nav-buttons">Регистрация
                         на экзамены в 8, 9, 10, 11 классы</a>
                 {% else %}
-                    <a href="/register/8-11" class="btn btn-primary" id="nav-buttons">Регистрация на экзамены в 8, 9,
+                    <a href="/register/8-11" class="btn btn-primary position-relative" id="nav-buttons">Регистрация на экзамены в 8, 9,
                         10, 11 классы</a>
                 {% endif %}
             {% endif %}
             {% if "/login" == current %}
-                <a href="/login" class="btn btn-primary active" aria-current="page" id="nav-buttons">Войти в личный
+                <a href="/login" class="btn btn-primary active position-relative" aria-current="page" id="nav-buttons">Войти в личный
                     кабинет</a>
             {% else %}
-                <a href="/login" class="btn btn-primary" id="nav-buttons">Войти в личный кабинет</a>
+                <a href="/login" class="btn btn-primary position-relative" id="nav-buttons">Войти в личный кабинет</a>
             {% endif %}
         {% endif %}
     </div>
