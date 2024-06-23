@@ -46,7 +46,7 @@
     background: #eae7dc;
     font-size: 18px;
     margin: auto;
-    width: 80%;
+    width: 90%;
     color: #374785;
 }
 
@@ -65,7 +65,7 @@
     text-align: center;
     margin: auto;
     border-bottom: 2px solid #d8c3a5;
-    max-width: 60%;
+    max-width: 70%;
 }
 
 .p-style{
@@ -76,6 +76,7 @@
 #nav-buttons{
     margin: 5px;
     font-size: 16px !important;
+    width: 300px;
 }
 
 .description_form{
@@ -99,4 +100,13 @@ tr.spaceUnder>td {
 .checkbox2 {
     height: 16px !important;
     width: 16px !important;
+}
+
+#application-cards {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
 }

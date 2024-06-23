@@ -1,10 +1,13 @@
+from time import sleep
+
 import aiosmtplib
+import smtplib
 import asyncio
 from email.mime.text import MIMEText
 
 import phonenumbers
-from flask import request, url_for
-from flask_login import current_user, login_user
+from flask import request
+from flask_login import current_user
 from py_scripts.forms import RegisterFormClasses8To11, RegisterFormAdmins
 from sa_models.users import User
 from sa_models.notifications import Notification
@@ -13,6 +16,8 @@ from sa_models import db_session
 import os
 import random
 import json
+from werkzeug.utils import secure_filename
+from multiprocessing import Process
 
 
 async def write_email(email, text, subj):
@@ -29,45 +34,86 @@ async def write_email(email, text, subj):
     await smtpObj.quit()
 
 
-def generate_and_send_password(email, name, surname):
+# ДЛЯ ПИСЕМ О СТАТУСЕ ЗАЯВКИ
+def write_email_z(email, text, subj):
+    attempts = 9
+    while attempts > 0:
+        try:
+            smtpObj = smtplib.SMTP('smtp.yandex.ru', 587, timeout=90)
+            smtpObj.starttls()
+            break
+        except Exception:
+            attempts -= 1
+            if attempts == 0:
+                return
+        sleep(10)
+    config = json.load(open('py_scripts/consts/mailer.json', mode='rb'))
+    smtpObj.login(config['login'], config['password'])
+    mess = MIMEText(text, 'html')
+    mess['From'] = config['mail']
+    mess['To'] = email
+    mess['Subject'] = subj
+    smtpObj.sendmail(config['mail'], email, mess.as_string())
+    smtpObj.quit()
+
+
+def generate_and_send_password(email, name, surname, admin=False, third_name=None):
     psw_str = '23456789QWERTYUPASDFGHJKZXCVBNM'
     psw = "".join(random.choices(psw_str, k=8))
-    email_text = (f'<h2>Уважаемый(-ая) {name} {surname}!</h2>'
-                  f'Ваша анкета для поступающих в Лицей "Вторая Школа" получена. Мы проверим Ваши данные и в течение '
-                  f'трех рабочих дней отправим Вам письмо о статусе заявки.<br>'
-                  f'Ваш пароль от личного кабинета на сайте приемной кампании Лицея "Вторая Школа":'
-                  f'<h3>{psw}</h3>'
-                  f'Если Вы не подавали заявку на поступление, сообщите нам об этом по электронной почте: '
-                  f'<a href="mailto:abitur@sch2.ru">abitur@sch2.ru</a>.<br><br>'
-                  f'С уважением,<br>'
-                  f'Лицей "Вторая Школа"')
-    asyncio.run(write_email(email, email_text, 'Заявка на участие во вступительных испытаниях в Лицей "Вторая Школа"'))
+    if admin:
+        email_text = (f'<h2>Уважаемый(-ая) {name} {third_name}!</h2>'
+                      f'Ваш пароль от личного кабинета на сайте приемной кампании Лицея "Вторая Школа":'
+                      f'<h3>{psw}</h3>'
+                      f'Если Вы не подавали заявку на поступление, сообщите нам об этом по электронной почте: '
+                      f'<a href="mailto:abitur@sch2.ru">abitur@sch2.ru</a>.<br><br>'
+                      f'С уважением,<br>'
+                      f'Лицей "Вторая Школа"')
+    else:
+        email_text = (f'<h2>Уважаемый(-ая) {name} {surname}!</h2>'
+                      f'Ваша анкета для поступающих в Лицей "Вторая Школа" получена. Мы проверим Ваши данные и в течение '
+                      f'трех рабочих дней отправим Вам письмо о статусе заявки.<br>'
+                      f'Ваш пароль от личного кабинета на сайте приемной кампании Лицея "Вторая Школа":'
+                      f'<h3>{psw}</h3>'
+                      f'Если Вы не подавали заявку на поступление, сообщите нам об этом по электронной почте: '
+                      f'<a href="mailto:abitur@sch2.ru">abitur@sch2.ru</a>.<br><br>'
+                      f'С уважением,<br>'
+                      f'Лицей "Вторая Школа"')
+    asyncio.run(
+        write_email(email, email_text, 'Заявка на участие во вступительных испытаниях в Лицей "Вторая Школа"')
+    )
     return psw
 
 
-def generate_and_send_password_recover(email, name, surname):
+def generate_and_send_password_recover(email, name, surname, admin=False, third_name=None):
     psw_str = '23456789QWERTYUPASDFGHJKZXCVBNM'
     psw = "".join(random.choices(psw_str, k=8))
-    email_text = (f'<h2>Уважаемый(-ая) {name} {surname}!</h2>'
-                  f'Ваш новый пароль от личного кабинета на сайте приемной кампании Лицея "Вторая Школа":'
-                  f'<h3>{psw}</h3><br>'
-                  f'С уважением,<br>'
-                  f'Лицей "Вторая Школа"')
-    asyncio.run(write_email(email, email_text, 'Сброс пароля на сайте приемной кампании Лицея "Вторая Школа"'))
+    if admin:
+        email_text = (f'<h2>Уважаемый(-ая) {name} {third_name}!</h2>'
+                      f'Ваш новый пароль от личного кабинета на сайте приемной кампании Лицея "Вторая Школа":'
+                      f'<h3>{psw}</h3><br>'
+                      f'С уважением,<br>'
+                      f'Лицей "Вторая Школа"')
+    else:
+        email_text = (f'<h2>Уважаемый(-ая) {name} {surname}!</h2>'
+                      f'Ваш новый пароль от личного кабинета на сайте приемной кампании Лицея "Вторая Школа":'
+                      f'<h3>{psw}</h3><br>'
+                      f'С уважением,<br>'
+                      f'Лицей "Вторая Школа"')
+    asyncio.run(
+        write_email(email, email_text, 'Сброс пароля на сайте приемной кампании Лицея "Вторая Школа"')
+    )
     return psw
 
 
-def register_user(request: request, form: RegisterFormClasses8To11):
+def register_user(request: request, form: RegisterFormClasses8To11, folder):
     try:
         psw = generate_and_send_password(form.email.data, form.name.data, form.surname.data)
     except Exception:
         return -1
 
     uploaded_file = request.files['photo']
-    type_ = uploaded_file.filename.split('.')[-1]
-    file_path = os.path.join('abitur_data', 'photos',
-                             f'{form.surname.data}_{form.name.data}_{form.third_name.data}.{type_}')
-    uploaded_file.save(file_path)
+    filename = f'{form.surname.data}_{form.name.data}_{form.third_name.data}_' + secure_filename(uploaded_file.filename)
+    uploaded_file.save(os.path.join(folder, filename))
     try:
         prof = form.profile.data
     except Exception:
@@ -87,7 +133,7 @@ def register_user(request: request, form: RegisterFormClasses8To11):
         parent_surname=form.parent_surname.data,
         parent_third_name=form.parent_third_name.data,
         parent_phone_number=new_num,
-        photo_path=file_path,
+        photo_path=os.path.join(folder, filename),
         profile_10_11=prof,
         class_number=form.class_number.data,
         status="4"
@@ -111,7 +157,8 @@ def register_user(request: request, form: RegisterFormClasses8To11):
 
 def register_admin(form: RegisterFormAdmins):
     try:
-        psw = generate_and_send_password(form.email.data, form.name.data, form.surname.data)
+        psw = generate_and_send_password(form.email.data, form.name.data, form.surname.data, admin=True,
+                                         third_name=form.third_name.data)
     except Exception:
         return -1
 
@@ -143,7 +190,7 @@ def generate_data_for_base(current='/', title='Главная', user_id=''):
     reg_stats = json.load(open('py_scripts/consts/registration_status.json', mode='rb'))
     d = dict()
     d['exams_on'] = reg_stats
-    d['pic_url'] = url_for('static', filename='img/logo.png')
+    # d['pic_url'] = url_for('static', filename='img/logo.png')
     d['pages'] = json.load(open('py_scripts/consts/pages.json', mode='rb'))
     d['admin_pages'] = json.load(open('py_scripts/consts/admin_pages.json', mode='rb'))
     d['current'] = current
@@ -154,13 +201,15 @@ def generate_data_for_base(current='/', title='Главная', user_id=''):
                                     reverse=True)
         for notif in d['notifications']:
             db_sess.delete(notif)
+        if current_user.role == 'admin':
+            d['application_number'] = (db_sess.query(User).filter(User.status == "4", User.role != 'admin')
+                                       .count())
     elif user_id != '':
-        d['notifications'] = sorted(db_sess.query(Notification).where(Notification.user_id == int(user_id)).all(),
-                                    key=lambda a: a.made_on, reverse=True)
+        d['notifications'] = (db_sess.query(Notification).where(Notification.user_id == int(user_id))
+                              .order_by(Notification.made_on.desc()).all())
         for notif in d['notifications']:
             db_sess.delete(notif)
     db_sess.commit()
-    d['application_number'] = db_sess.query(User).where(User.status == "4").count()
     db_sess.close()
     return d
 
@@ -169,7 +218,8 @@ def reset_password(user_id):
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(user_id)
     try:
-        psw = generate_and_send_password_recover(user.email, user.name, user.surname)
+        psw = generate_and_send_password_recover(user.email, user.name, user.surname, admin=user.role == 'admin',
+                                                 third_name=user.third_name)
     except Exception:
         db_sess.close()
         return -1
@@ -200,7 +250,8 @@ def generate_and_send_recover_link(email, name, surname, user_id):
                   f'Лицей "Вторая Школа"')
     asyncio.run(
         write_email(email, email_text, 'Восстановление пароля от личного кабинета на сайте приемной кампании Лицея '
-                                       '"Вторая Школа"'))
+                                       '"Вторая Школа"')
+    )
     db_sess = db_session.create_session()
     rec = Recover(
         email=email,
@@ -217,3 +268,15 @@ def generate_and_send_recover_link(email, name, surname, user_id):
     db_sess.add(notif)
     db_sess.commit()
     db_sess.close()
+
+
+def status_changed_notif(email, name, surname, ins_status):
+    email_text = (f'<h2>Уважаемый(-ая) {name} {surname}!</h2>'
+                  f'Статус Вашей заявки на сайте приемной кампании Лицея "Вторая Школа" обновился на "{ins_status}"!<br>'
+                  f'Подробнее: http://127.0.0.1:8080/lk<br><br>'
+                  f'С уважением,<br>'
+                  f'Лицей "Вторая Школа"')
+    p1 = Process(target=write_email_z, args=(email, email_text, 'Статус заявки на сайте приемной кампании Лицея '
+                                                                '"Вторая Школа"'),
+                 daemon=True)
+    p1.start()

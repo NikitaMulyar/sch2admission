@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2 class="h2-style"><b>Заявки на участие в конкурсе</b></h2><br>
+    <div id="application-cards">
+    {% if not user_list %}
+        <p class="p-style">Заявок нет.</p>
+    {% else %}
+        {% for user in user_list %}
+            <div class="card" style="width: 80%; margin-bottom: 10px;">
+                <a href="/{{ user[0] }}" target="_blank"><img src="/{{ user[0] }}" class="card-img-top" alt="/{{ user[0] }}" style="width: 250px; display:block; margin:auto;"></a>
+                <div class="card-body">
+                    <h4 class="card-title">{{ user[1] }}</h4>
+                    <table class="table table-bordered" style="word-wrap: break-word; table-layout: fixed;">
+                        <tbody>
+                        {% for row in user[2] %}
+                            <tr>
+                                <th scope="row" style="width: 30%">{{ row[0] }}</th>
+                                <td>{{ row[1] }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <p class="card-text">Дата регистрации: {{ user[3] }}</p>
+                    <a href="application/{{ user[4] }}/approve" class="btn btn-success" style="font-size: 18px !important;">Одобрить</a>
+                    <a href="application/{{ user[4] }}/reject" class="btn btn-danger" style="font-size: 18px !important;">Отклонить</a>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+    </div>
+{% endblock %}

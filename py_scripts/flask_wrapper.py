@@ -4,6 +4,7 @@ from flask import Flask
 class FlaskAppWrapper:
     def __init__(self, app: Flask):
         self.app = app
+        self.config = app.config
 
     def add_endpoint(self, endpoint=None, endpoint_name=None, handler=None, methods=['GET'], *args, **kwargs):
         self.app.add_url_rule(endpoint, endpoint_name, handler, methods=methods, *args, **kwargs)

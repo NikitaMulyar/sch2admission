@@ -103,9 +103,9 @@ class ExamCreateForm(FlaskForm):
                           validators=[DataRequired('Обязательное поле')],
                           description='Нажмите на поле, чтобы выбрать профиль')
     exam_description = TextAreaField('Введите описание экзамена',
-                                     description=Markup('Для использования форматирования текста применяйте Markdown: '
-                                                        '<a target="_blank" href="https://www.markdownguide.org/basic-syntax/'
-                                                        '#emphasis">Пример</a>'),
+                                     description='Для использования форматирования текста применяйте Markdown: '
+                                                 '<a target="_blank" href="https://www.markdownguide.org/basic-syntax/'
+                                                 '#emphasis">Пример</a>',
                                      validators=[DataRequired('Обязательное поле')])
     submit = SubmitField('Создать экзамен')
 

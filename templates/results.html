@@ -1,5 +1,35 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2 class="h2-style"><b>Результаты испытаний</b></h2><br>
+    <h2 class="h2-style"><b>Результаты вступительных испытаний</b></h2><br>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col" style="width: 5%">№</th>
+            <th scope="col" style="width: 27.5%">Испытание</th>
+            <th scope="col" style="width: 20%">Дата</th>
+            <th scope="col" style="width: 15%">Результат</th>
+            <th scope="col" style="width: 32.5%">Комментарий</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for invite in invites %}
+            {% set res = "danger" %}
+            {% if invite[4] == "0" %}
+                {% set res = "success" %}
+            {% elif invite[4] == "4" or invite[4] == "5" %}
+                {% set res = "warning" %}
+            {% elif not invite[4] %}
+                {% set res = "primary" %}
+            {% endif %}
+            <tr class="spaceUnder">
+                <th scope="row">{{ loop.index }}</th>
+                <td>{{ invite[0] }}</td>
+                <td>{{ invite[1] }}</td>
+                <td class="table-{{ res }}">{{ invite[2] }}</td>
+                <td>{{ invite[3] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

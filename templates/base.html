@@ -9,82 +9,109 @@
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <body id="base-style">
-<nav>
-    <div class="alert alert-primary" role="alert" style="text-align: center; margin: auto;">
-        <img src="{{ pic_url }}" style="width: 70px; height: 70px;">
-
-        <h1><b>Поступление в Лицей «Вторая Школа»</b></h1>
-
-        {% if "/" == current %}
-            <a href="/" class="btn btn-primary active position-relative" aria-current="page" id="nav-buttons">Главная</a>
+<div class="alert alert-primary" role="alert" style="text-align: center; margin: auto; margin-bottom: 10px;">
+    <a href="http://sch2.ru" target="_blank"><img src="/static/img/logo.png" style="width: 70px; height: 70px;"></a>
+    <h1><b>Поступление в Лицей «Вторая Школа»</b></h1>
+</div>
+<nav class="nav nav-fill">
+    <li class="nav-item">
+    {% if "/" == current %}
+        <a href="/" class="btn btn-primary active position-relative" aria-current="page" id="nav-buttons">Главная</a>
+    {% else %}
+        <a href="/" class="btn btn-primary position-relative" id="nav-buttons">Главная</a>
+    {% endif %}
+    </li>
+    {% if not current_user.is_authenticated or current_user.is_authenticated and current_user.role != 'admin' %}
+        <li class="nav-item">
+        {% if "/contacts" == current %}
+            <a href="/contacts" class="btn btn-primary active position-relative" aria-current="page" id="nav-buttons">Контакты</a>
         {% else %}
-            <a href="/" class="btn btn-primary position-relative" id="nav-buttons">Главная</a>
+            <a href="/contacts" class="btn btn-primary position-relative" id="nav-buttons">Контакты</a>
         {% endif %}
-        {% if not current_user.is_authenticated or current_user.is_authenticated and current_user.role != 'admin' %}
-            {% if "/contacts" == current %}
-                <a href="/contacts" class="btn btn-primary active position-relative" aria-current="page" id="nav-buttons">Контакты</a>
+        </li>
+        <li class="nav-item">
+        <a href="https://lycuz2.mskobr.ru/roditelyam/algoritm-postuplenia/profilnye-klassy#/html/body/div[2]/div[3]/div/div[2]/div/div[3]/div[1]/div/div/div[1]/div/div/div"
+           class="btn btn-primary position-relative" id="nav-buttons" target="_blank">Материалы для подготовки</a>
+        </li>
+    {% endif %}
+    {% if current_user.is_authenticated and current_user.role != 'admin' %}
+        {% for page in pages %}
+            <li class="nav-item">
+            {% if page == current %}
+                <a href="{{ page }}" class="btn btn-primary active position-relative" aria-current="page"
+                   id="nav-buttons">{{ pages[page] }}</a>
             {% else %}
-                <a href="/contacts" class="btn btn-primary position-relative" id="nav-buttons">Контакты</a>
+                <a href="{{ page }}" class="btn btn-primary position-relative" id="nav-buttons">{{ pages[page] }}</a>
             {% endif %}
-            <a href="https://lycuz2.mskobr.ru/roditelyam/algoritm-postuplenia/profilnye-klassy#/html/body/div[2]/div[3]/div/div[2]/div/div[3]/div[1]/div/div/div[1]/div/div/div"
-               class="btn btn-primary position-relative" id="nav-buttons" target="_blank">Материалы для подготовки</a>
-        {% endif %}
-        {% if current_user.is_authenticated and current_user.role != 'admin' %}
-            {% for page in pages %}
-                {% if page == current %}
-                    <a href="{{ page }}" class="btn btn-primary active position-relative" aria-current="page"
-                       id="nav-buttons">{{ pages[page] }}</a>
-                {% else %}
-                    <a href="{{ page }}" class="btn btn-primary position-relative" id="nav-buttons">{{ pages[page] }}</a>
-                {% endif %}
-            {% endfor %}
-        {% elif current_user.is_authenticated and current_user.role == 'admin' %}
-            {% for page in admin_pages %}
-                {% if page == current %}
-                    <a href="{{ page }}" class="btn btn-primary active position-relative" aria-current="page"
-                       id="nav-buttons">{{ admin_pages[page] }}</a>
-                {% else %}
-                    <a href="{{ page }}" class="btn btn-primary position-relative" id="nav-buttons">{{ admin_pages[page] }}
-                        {% if page == '/applications' and application_number != 0 %}
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            </li>
+        {% endfor %}
+    {% elif current_user.is_authenticated and current_user.role == 'admin' %}
+        {% for page in admin_pages %}
+            <li class="nav-item">
+            {% if page == current %}
+                <a href="{{ page }}" class="btn btn-primary active position-relative" aria-current="page"
+                   id="nav-buttons">{{ admin_pages[page] }}
+                    {% if page == '/applications' and application_number != 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                 {% if application_number > 999 %}
                                     999+
                                 {% else %}
                                     {{ application_number }}
                                 {% endif %}
-                                <span class="visually-hidden">Есть нерассмотренные заявки</span>
+                            <span class="visually-hidden">Есть нерассмотренные заявки</span>
                             </span>
-                        {% endif %}
-                    </a>
-                {% endif %}
-            {% endfor %}
-        {% else %}
-            {% if exams_on["6-7"] %}
-                {% if "/register/6-7" == current %}
-                    <a href="/register/6-7" class="btn btn-primary active position-relative" aria-current="page" id="nav-buttons">Регистрация
-                        на экзамены в 6, 7 классы</a>
-                {% else %}
-                    <a href="/register/6-7" class="btn btn-primary position-relative" id="nav-buttons">Регистрация на экзамены в 6, 7
-                        классы</a>
-                {% endif %}
-            {% endif %}
-            {% if exams_on["8-11"] %}
-                {% if "/register/8-11" == current %}
-                    <a href="/register/8-11" class="btn btn-primary active position-relative" aria-current="page" id="nav-buttons">Регистрация
-                        на экзамены в 8, 9, 10, 11 классы</a>
-                {% else %}
-                    <a href="/register/8-11" class="btn btn-primary position-relative" id="nav-buttons">Регистрация на экзамены в 8, 9,
-                        10, 11 классы</a>
-                {% endif %}
-            {% endif %}
-            {% if "/login" == current %}
-                <a href="/login" class="btn btn-primary active position-relative" aria-current="page" id="nav-buttons">Войти в личный
-                    кабинет</a>
+                    {% endif %}
+                </a>
             {% else %}
-                <a href="/login" class="btn btn-primary position-relative" id="nav-buttons">Войти в личный кабинет</a>
+                <a href="{{ page }}" class="btn btn-primary position-relative" id="nav-buttons">{{ admin_pages[page] }}
+                    {% if page == '/applications' and application_number != 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {% if application_number > 999 %}
+                                    999+
+                                {% else %}
+                                    {{ application_number }}
+                                {% endif %}
+                            <span class="visually-hidden">Есть нерассмотренные заявки</span>
+                            </span>
+                    {% endif %}
+                </a>
             {% endif %}
+            </li>
+        {% endfor %}
+    {% else %}
+        {% if exams_on["6-7"] %}
+            <li class="nav-item">
+            {% if "/register/6-7" == current %}
+                <a href="/register/6-7" class="btn btn-primary active position-relative" aria-current="page"
+                   id="nav-buttons">Регистрация на испытания в 6, 7 классы</a>
+            {% else %}
+                <a href="/register/6-7" class="btn btn-primary position-relative" id="nav-buttons">Регистрация на
+                    испытания в 6, 7 классы</a>
+            {% endif %}
+            </li>
         {% endif %}
-    </div>
+        {% if exams_on["8-11"] %}
+            <li class="nav-item">
+            {% if "/register/8-11" == current %}
+                <a href="/register/8-11" class="btn btn-primary active position-relative" aria-current="page"
+                   id="nav-buttons">Регистрация
+                    на испытания в 8, 9, 10, 11 классы</a>
+            {% else %}
+                <a href="/register/8-11" class="btn btn-primary position-relative" id="nav-buttons">Регистрация на
+                    испытания в 8, 9,
+                    10, 11 классы</a>
+            {% endif %}
+            </li>
+        {% endif %}
+        <li class="nav-item">
+        {% if "/login" == current %}
+            <a href="/login" class="btn btn-primary active position-relative" aria-current="page" id="nav-buttons">Войти
+                в личный кабинет</a>
+        {% else %}
+            <a href="/login" class="btn btn-primary position-relative" id="nav-buttons">Войти в личный кабинет</a>
+        {% endif %}
+        </li>
+    {% endif %}
 </nav>
 <br>
 {% block content %}{% endblock %}
@@ -102,13 +129,13 @@
                     {% else %}
                         <span class="badge rounded-pill bg-danger">Новое</span>
                     {% endif %}
-                    {{ notif.text }}<br>
+                    {{ notif.text|safe }}<br>
                     <small class="text-body-secondary">{{ notif.made_on_str }}</small>
                     <div class="mt-2 pt-2 border-top">
                         {% if notif.type != 'system' and notif.type != 'warn' %}
-                            <button type="button" class="btn btn-dark btn-sm" href="{{ notif.link }}">Показать</button>
+                            <a class="btn btn-dark btn-sm" href="{{ notif.link }}">Показать</a>
                         {% endif %}
-                        <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="toast">Позже</button>
+                        <a class="btn btn-light btn-sm" data-bs-dismiss="toast">Позже</a>
                     </div>
                 </div>
             </div>
@@ -117,7 +144,8 @@
     </div>
 </div>
 <footer id="footer-style">
-    <p>Официальный сайт Лицея: <a href="https://lycuz2.mskobr.ru/" target="_blank">https://lycuz2.mskobr.ru/</a><br>
+    <p>Официальные сайты Лицея: <a href="https://lycuz2.mskobr.ru" target="_blank">lycuz2.mskobr.ru</a>,
+        <a href="http://sch2.ru" target="_blank">sch2.ru</a><br>
         Разработчики сайта: Муляр Никита 11"Б", Давидян Матвей 11"Д"<br>
         Связаться c разработчиками: <a href="mailto:muliar.nm@students.sch2.ru">muliar.nm@students.sch2.ru</a>,
         <a href="mailto:davidian.ma@students.sch2.ru">davidian.ma@students.sch2.ru</a></p>

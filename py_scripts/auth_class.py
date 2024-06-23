@@ -16,12 +16,17 @@ from py_scripts.funcs_back import (register_user, generate_data_for_base, genera
                                    register_admin)
 
 
+FOLDER = ''
+
+
 class AuthClass:
     def __init__(self, app):
+        global FOLDER
         app.add_endpoint('/login', 'back_login', self.back_login, methods=['GET', 'POST'])
         app.add_endpoint('/logout', 'logout', self.logout)
         app.add_endpoint('/register/<classes>', 'back_register', self.back_register, methods=['GET', 'POST'])
         app.add_endpoint('/recover/<code>', 'back_recover', self.back_recover, methods=['GET', 'POST'])
+        FOLDER = app.config['UPLOAD_FOLDER']
 
     @staticmethod
     def login_forbidden(func):
@@ -125,7 +130,7 @@ class AuthClass:
                 form.email.errors.append('Пользователь с такой эл. почтой уже существует.')
             else:
                 db_sess.close()
-                res = register_user(request, form)
+                res = register_user(request, form, FOLDER)
                 if res != -1:
                     resp = make_response(redirect('/login'))
                     resp.set_cookie("server_data", res, max_age=60 * 60 * 24 * 365)

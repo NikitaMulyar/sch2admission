@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_login import LoginManager
 
 from py_scripts.flask_wrapper import FlaskAppWrapper
@@ -14,6 +14,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 app_fl = Flask(__name__)
 db_session.global_init('database/admission.db')
 app_fl.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+app_fl.config['UPLOAD_FOLDER'] = 'uploads'
 login_manager = LoginManager()
 login_manager.init_app(app_fl)
 
@@ -26,6 +27,11 @@ auth = AuthClass(app)
 def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
+
+
+@app_fl.route(f'/{app.config["UPLOAD_FOLDER"]}/<name>')
+def download_file(name):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], name)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <h2 class="h2-style"><b>Вступительные испытания</b></h2><br>
     <a href="/exams/statuses" class="btn btn-danger" style="margin-bottom: 10px; font-size: 18px !important;">Открыть/закрыть регистрацию на экзамены</a>
     <br>
     <a href="/exams/create" class="btn btn-success" style="margin-bottom: 10px; font-size: 18px !important;">Создать новый экзамен</a>
@@ -24,18 +25,18 @@
                                 <tr>
                                     <th scope="col" style="width: 2.5%">№</th>
                                     <th scope="col" style="width: 5%">ID</th>
-                                    <th scope="col" style="width: 32.5%">Испытание</th>
+                                    <th scope="col" style="width: 30%">Испытание</th>
                                     <th scope="col" style="width: 30%">Профиль</th>
                                     <th scope="col" style="width: 20%">Дата</th>
-                                    <th scope="col" style="width: 10%">Подробнее</th>
+                                    <th scope="col" style="width: 12.5%">Подробнее</th>
                                 </tr>
                             {% else %}
                                 <tr>
                                     <th scope="col" style="width: 2.5%">№</th>
                                     <th scope="col" style="width: 5%">ID</th>
-                                    <th scope="col" style="width: 47.5%">Испытание</th>
+                                    <th scope="col" style="width: 45%">Испытание</th>
                                     <th scope="col" style="width: 35%">Дата</th>
-                                    <th scope="col" style="width: 10%">Подробнее</th>
+                                    <th scope="col" style="width: 12.5%">Подробнее</th>
                                 </tr>
                             {% endif %}
                             </thead>

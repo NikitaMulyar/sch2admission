@@ -32,7 +32,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     family_friends_in_l2sh = sqlalchemy.Column(sqlalchemy.Text, nullable=True)
     reg_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 
-    role = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    role = sqlalchemy.Column(sqlalchemy.String, default='user')
 
     invites = orm.relationship("Invite", back_populates="parent_user", cascade="all, delete")
     notifications = orm.relationship("Notification", back_populates="parent_user", cascade="all, delete")
