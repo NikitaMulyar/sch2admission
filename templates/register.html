@@ -110,9 +110,15 @@
                 <div class="description_form">{{ form.profile.description }}</div>
                 {{ form.profile(class="form-control") }}
                 {% for error in form.profile.errors %}
-                    <p class="alert alert-danger" role="alert">
-                        {{ error }}
-                    </p>
+                    <div class="alert alert-danger d-flex align-items-center" role="alert"
+                         style="margin-top: 5px !important;">
+                        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
+                            <use xlink:href="#exclamation-triangle-fill"/>
+                        </svg>
+                        <div>
+                            {{ error }}
+                        </div>
+                    </div>
                 {% endfor %}
                 </p>
             {% endif %}

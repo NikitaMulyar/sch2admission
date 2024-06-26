@@ -3,16 +3,30 @@ import os
 from flask import render_template, request, make_response, redirect, abort
 from flask_login import current_user, login_required
 import json
-from py_scripts.funcs_back import generate_data_for_base, status_changed_notif
+from py_scripts.funcs_back import generate_data_for_base, status_changed_notif, mailing_invites, INVITES_PROCESS
 from sa_models import db_session
 from sa_models.exams import Exam
 from sa_models.invites import Invite
 from sa_models.notifications import Notification
 from py_scripts.forms import ExamCreateForm, ExamStatusesForm
+from py_scripts.forms import InvitesForm
 
 from markupsafe import Markup
 
 from sa_models.users import User
+
+
+def must_fill_these_fields():
+    notif = Notification(
+        user_id=current_user.id,
+        type='warn',
+        text='Сначала необходимо дозаполнить эти поля!'
+    )
+    notif.set_str_date()
+    db_sess = db_session.create_session()
+    db_sess.add(notif)
+    db_sess.commit()
+    db_sess.close()
 
 
 class Pages:
@@ -26,6 +40,9 @@ class Pages:
         app.add_endpoint('/exams/<exam_id>', 'back_exam_info', self.back_exam_info, methods=['GET', 'POST'])
         app.add_endpoint('/applications', 'back_applications', self.back_applications)
         app.add_endpoint('/application/<int:user_id>/<action>', 'back_application_action', self.back_application_action)
+        app.add_endpoint('/inviting/<step>', 'back_inviting', self.back_inviting, methods=['GET', 'POST'])
+        app.add_endpoint('/inviting', 'back_inviting_handler', self.back_inviting_handler)
+        app.add_endpoint('/inviting/end/end', 'back_inviting_end_setting', self.back_inviting_end_setting)
 
     @staticmethod
     def admin_forbidden(func):
@@ -141,8 +158,8 @@ class Pages:
                 if form.title.data == 'Другое' and not form.new_title.data:
                     form.new_title.errors.append('Обязательное поле')
                 else:
-                    profile = ''
-                    if int(form.class_number.data) >= 10:
+                    profile = 'Общий'
+                    if form.class_number.data >= 10:
                         profile = form.profile.data
                     title = form.title.data
                     if title == 'Другое':
@@ -151,7 +168,7 @@ class Pages:
                         title=title,
                         date=form.date.data,
                         exam_description=form.exam_description.data,
-                        for_class=int(form.class_number.data),
+                        for_class=form.class_number.data,
                         profile_10_11=profile
                     )
                     notif = Notification(
@@ -260,3 +277,262 @@ class Pages:
         status_changed_notif(user.email, user.name, user.surname, f'<b style="color: {clr}">{txt.upper()}</b>')
         db_sess.close()
         return redirect('/applications')
+
+    @staticmethod
+    @login_required
+    @non_admin_forbidden
+    def back_inviting_handler():
+        return redirect('/inviting/1')
+
+    @staticmethod
+    @login_required
+    @non_admin_forbidden
+    def back_inviting(step):
+        steps = ['1', '2', 'a1', 'a2', 'm']
+        if step not in steps:
+            abort(404)
+
+        if request.method == "GET":
+            path_ = f'admin_data/invites_config/invite_{current_user.id}.json'
+            if not os.path.exists(path_):
+                info = dict()
+                info["CLASS"] = -1                 # part 1
+                info["PROFILE"] = ''               # part 1
+                info["EXAM_ID_NEW"] = -1           # part 2
+                info["INVITE_DESCRIPTION"] = ''    # part 2
+                info["EXAM_IDS_NEED"] = []         # part 2
+                info["LIMIT"] = -1                 # auto 1
+                info["PRIORITY"] = -1              # auto 1
+                info["TIMES_WRITTEN"] = []         # auto 1
+                info["STUDENTS_IDS"] = []          # auto 2 / manual
+                json.dump(info, open(path_, mode='w'))
+            info = json.load(open(path_, mode='rb'))
+
+            if step == '1':
+                form = InvitesForm.get_part_1()
+                if info["CLASS"] != -1:
+                    form.class_number.data = info["CLASS"]
+                if info["PROFILE"] != '' and info["PROFILE"] != 'Общий':
+                    form.profile.data = info["PROFILE"]
+
+                return render_template('inviting_form/part1.html',
+                                       **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                                                             'вступительные испытания'),
+                                       form=form)
+            elif step == '2':
+                if info['CLASS'] == -1 or info['PROFILE'] == '':
+                    must_fill_these_fields()
+                    return redirect('/inviting/1')
+
+                form = InvitesForm.get_part_2(**info)
+                if info["EXAM_ID_NEW"] != -1:
+                    form.exam.data = info["EXAM_ID_NEW"]
+                if info["INVITE_DESCRIPTION"] != '':
+                    form.invite_description.data = info["INVITE_DESCRIPTION"]
+                if info["EXAM_IDS_NEED"] != []:
+                    for ex in info["EXAM_IDS_NEED"]:
+                        form.__getattribute__(f'exam_need_{ex[0]}').data = True
+
+                return render_template('inviting_form/part2.html',
+                                       **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                                                             'вступительные испытания'),
+                                       form=form)
+            elif step == 'a1':
+                if info['CLASS'] == -1 or info['PROFILE'] == '':
+                    must_fill_these_fields()
+                    return redirect('/inviting/1')
+
+                if info['EXAM_ID_NEW'] == -1 or info['INVITE_DESCRIPTION'] == '':
+                    must_fill_these_fields()
+                    return redirect('/inviting/2')
+
+                form = InvitesForm.get_part_a1()
+                if info["LIMIT"] != -1:
+                    form.students_number.data = info["LIMIT"]
+                if info["PRIORITY"] != -1:
+                    form.priority.data = info["PRIORITY"]
+                if info["TIMES_WRITTEN"] != []:
+                    if 0 in info["TIMES_WRITTEN"]:
+                        form.written_0_times.data = True
+                    if 1 in info["TIMES_WRITTEN"]:
+                        form.written_1_times.data = True
+                    if 2 in info["TIMES_WRITTEN"]:
+                        form.written_2_times.data = True
+
+                return render_template('inviting_form/partA1.html',
+                                       **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                                                             'вступительные испытания'),
+                                       form=form)
+            elif step == 'a2':
+                if info['CLASS'] == -1 or info['PROFILE'] == '':
+                    must_fill_these_fields()
+                    return redirect('/inviting/1')
+
+                if info['EXAM_ID_NEW'] == -1 or info['INVITE_DESCRIPTION'] == '':
+                    must_fill_these_fields()
+                    return redirect('/inviting/2')
+
+                if info['LIMIT'] == -1 or info['PRIORITY'] == -1 or info['TIMES_WRITTEN'] == []:
+                    must_fill_these_fields()
+                    return redirect('/inviting/a1')
+
+                form = InvitesForm.get_part_a2(**info)
+                return render_template('inviting_form/partA2.html',
+                                       **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                                                             'вступительные испытания'),
+                                       form=form)
+            elif step == 'm':
+                if info['CLASS'] == -1 or info['PROFILE'] == '':
+                    must_fill_these_fields()
+                    return redirect('/inviting/1')
+
+                if info['EXAM_ID_NEW'] == -1 or info['INVITE_DESCRIPTION'] == '':
+                    must_fill_these_fields()
+                    return redirect('/inviting/2')
+
+                form = InvitesForm.get_part_m(**info)
+                return render_template('inviting_form/partM.html',
+                                       **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                                                             'вступительные испытания'),
+                                       form=form)
+        elif request.method == "POST":
+            path_ = f'admin_data/invites_config/invite_{current_user.id}.json'
+            if not os.path.exists(path_):
+                return redirect('/inviting/1')
+            info = json.load(open(path_, mode='rb'))
+
+            if step == '1':
+                form = InvitesForm.get_part_1()
+
+                if form.validate_on_submit():
+                    info['CLASS'] = form.class_number.data
+                    info['PROFILE'] = 'Общий'
+                    if info["CLASS"] >= 10:
+                        info['PROFILE'] = form.profile.data
+                    json.dump(info, open(path_, mode='w'))
+
+                    return redirect('/inviting/2')
+                return render_template('inviting_form/part1.html',
+                                       **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                                                             'вступительные испытания'),
+                                       form=form)
+            elif step == '2':
+                form = InvitesForm.get_part_2(**info)
+                print(form.type_of_constructor.data)
+                if form.validate_on_submit():
+                    info['EXAM_ID_NEW'] = form.exam.data
+                    info['INVITE_DESCRIPTION'] = form.invite_description.data
+                    info['EXAM_IDS_NEED'] = []
+                    for ex_id in form.exams_need_ids:
+                        ex_ = getattr(form, f'exam_need_{ex_id}')
+                        if ex_.data:
+                            info['EXAM_IDS_NEED'].append(ex_id)
+                    json.dump(info, open(path_, mode='w'))
+
+                    if form.type_of_constructor.data == 0:
+                        return redirect('/inviting/a1')
+                    return redirect('/inviting/m')
+                return render_template('inviting_form/part2.html',
+                                       **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                                                             'вступительные испытания'),
+                                       form=form)
+            elif step == 'a1':
+                form = InvitesForm.get_part_a1()
+
+                if form.validate_on_submit():
+                    info['LIMIT'] = form.students_number.data
+                    info['PRIORITY'] = form.priority.data
+                    info['TIMES_WRITTEN'] = []
+                    if form.written_0_times.data:
+                        info["TIMES_WRITTEN"].append(0)
+                    if form.written_1_times.data:
+                        info["TIMES_WRITTEN"].append(1)
+                    if form.written_2_times.data:
+                        info["TIMES_WRITTEN"].append(2)
+
+                    if len(info["TIMES_WRITTEN"]) == 0:
+                        form.written_2_times.errors.append('Необходимо выбрать хотя бы один пункт в кол-ве попыток')
+                        return render_template('inviting_form/partA1.html',
+                                               **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                                                                     'вступительные испытания'),
+                                               form=form)
+                    json.dump(info, open(path_, mode='w'))
+
+                    return redirect('/inviting/a2')
+                return render_template('inviting_form/partA1.html',
+                                       **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                                                             'вступительные испытания'),
+                                       form=form)
+            elif step == 'a2':
+                form = InvitesForm.get_part_a2(**info)
+
+                if form.validate_on_submit():
+                    info['STUDENTS_IDS'] = []
+                    for user_id in form.students_ids:
+                        ex_ = getattr(form, f'student_{user_id}')
+                        if ex_.data:
+                            info['STUDENTS_IDS'].append(user_id)
+                    json.dump(info, open(path_, mode='w'))
+
+                    return redirect('/inviting/end')
+                return render_template('inviting_form/partA2.html',
+                                       **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                                                             'вступительные испытания'),
+                                       form=form)
+            elif step == 'm':
+                form = InvitesForm.get_part_m(**info)
+
+                if form.validate_on_submit():
+                    info['STUDENTS_IDS'] = []
+                    for user_id in form.students_ids:
+                        ex_ = getattr(form, f'student_{user_id}')
+                        if ex_.data:
+                            info['STUDENTS_IDS'].append(user_id)
+                    json.dump(info, open(path_, mode='w'))
+
+                    return redirect('/inviting/end')
+                return render_template('inviting_form/partM.html',
+                                       **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                                                             'вступительные испытания'),
+                                       form=form)
+
+    @staticmethod
+    @login_required
+    @non_admin_forbidden
+    def back_inviting_end_setting():
+        path_ = f'admin_data/invites_config/invite_{current_user.id}.json'
+        if not os.path.exists(path_) and not INVITES_PROCESS.get(current_user.id):
+            return redirect('/inviting/1')
+        if not os.path.exists(path_) and INVITES_PROCESS.get(current_user.id):
+            # Pдесь должна быть красота типа, пока ждем рассылку
+            return render_template('inviting_form/mailing_part.html',
+                                   **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                                                         'вступительные испытания'))
+
+        info = json.load(open(path_, mode='rb'))
+        if info["STUDENTS_IDS"] == []:
+            db_sess = db_session.create_session()
+            notif = Notification(
+                user_id=current_user.id,
+                text=f'Вы не указали некоторые поля в форме. Проверьте, пожалуйста, еще раз.',
+                type='warn'
+            )
+            notif.set_str_date()
+            db_sess.add(notif)
+            db_sess.commit()
+            db_sess.close()
+            return redirect('/inviting/1')
+
+        db_sess = db_session.create_session()
+        users = db_sess.query(User).filter(User.id.in_(info["STUDENTS_IDS"])).all()
+        users_ = []
+        for user in users:
+            users_.append((user.email, f'{user.name} {user.surname}'))
+        exam = db_sess.query(Exam).get(info["EXAM_ID_NEW"])
+        exam = (exam.date.strftime('%d.%m'), exam.title)
+        db_sess.close()
+        mailing_invites(users_, info["INVITE_DESCRIPTION"], exam, current_user.id)
+        os.remove(path_)
+        return render_template('inviting_form/mailing_part.html',
+                               **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                                                     'вступительные испытания'))

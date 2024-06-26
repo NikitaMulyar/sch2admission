@@ -9,6 +9,7 @@ import phonenumbers
 from flask import request
 from flask_login import current_user
 from py_scripts.forms import RegisterFormClasses8To11, RegisterFormAdmins
+from sa_models.exams import Exam
 from sa_models.users import User
 from sa_models.notifications import Notification
 from sa_models.recovers import Recover
@@ -17,7 +18,9 @@ import os
 import random
 import json
 from werkzeug.utils import secure_filename
-from multiprocessing import Process
+from multiprocessing import Process, Queue
+
+INVITES_PROCESS = {}
 
 
 async def write_email(email, text, subj):
@@ -280,3 +283,37 @@ def status_changed_notif(email, name, surname, ins_status):
                                                                 '"Вторая Школа"'),
                  daemon=True)
     p1.start()
+
+
+def mailing_invites(users: list, text: str, exam, user):
+    def mailing_wrapper(users: list, text: str, exam, q: Queue):
+        async def async_mailing(users: list, text: str, exam, q: Queue):
+            async def mailing(subj: str, email: str, text: str, q: Queue):
+                mess = MIMEText(text, 'html')
+                mess['From'] = config['mail']
+                mess['To'] = email
+                mess['Subject'] = subj
+                await smtpObj.sendmail(config['mail'], email, mess.as_string())
+                q.put(email)
+
+            config = json.load(open('py_scripts/consts/mailer.json', mode='rb'))
+            smtpObj = aiosmtplib.SMTP(hostname='smtp.yandex.ru', port=587, timeout=10,
+                                      username=config['login'], password=config['password'],
+                                      validate_certs=False)
+            await smtpObj.connect()
+            tasks = []
+            for user in users:
+                tasks.append(
+                    mailing(f'Приглашение на вступительное испытание {exam[0]} {exam[1]}',
+                            user[0], text.format(user[1]), q)
+                )
+            await asyncio.gather(*tasks)
+            await smtpObj.quit()
+
+        asyncio.run(async_mailing(users, text, exam, q))
+        sleep(5)
+        INVITES_PROCESS.pop(user)
+
+    INVITES_PROCESS[user] = Queue()
+    p = Process(target=mailing_wrapper, args=(users, text, exam, INVITES_PROCESS[user]), daemon=True)
+    p.start()

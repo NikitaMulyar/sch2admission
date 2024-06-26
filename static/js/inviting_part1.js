@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     const submitButton = document.getElementById('myBtn');
+    const backButton = document.getElementById('buttons-style');
     const form = document.getElementById('myForm');
     const collapseContent = document.getElementById("collapseExample");
     const bsCollapse = new bootstrap.Collapse(collapseContent, {toggle: false});
@@ -7,9 +8,11 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', function(event) {
         bsCollapse.show();
         submitButton.hidden = true;
+        backButton.hidden = true;
         setTimeout(function() {
             bsCollapse.hide();
             submitButton.hidden = false;
+            backButton.hidden = false;
         }, 3000);
         form.submit();
     });
@@ -19,12 +22,5 @@ document.addEventListener('DOMContentLoaded', function() {
     showDiv.hidden = !(selectField.value === "10" || selectField.value === "11");
     selectField.addEventListener('change', function(event) {
         showDiv.hidden = !(selectField.value === "10" || selectField.value === "11");
-    });
-
-    const selectField_title = document.getElementById("title");
-    const showDiv2 = document.getElementById("other-title");
-    showDiv2.hidden = !(selectField_title.value === "Другое");
-    selectField_title.addEventListener('change', function(event) {
-        showDiv2.hidden = !(selectField_title.value === "Другое");
     });
 });

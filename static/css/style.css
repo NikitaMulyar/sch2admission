@@ -110,3 +110,11 @@ tr.spaceUnder>td {
     align-content: center;
     justify-content: center;
 }
+
+.exams-need-list {
+    margin: auto;
+}
+
+#buttons-style {
+    font-size: 18px !important;
+}
