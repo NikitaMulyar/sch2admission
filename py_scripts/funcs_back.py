@@ -4,6 +4,7 @@ import aiosmtplib
 import smtplib
 import asyncio
 from email.mime.text import MIMEText
+import markdown
 
 import phonenumbers
 from flask import request
@@ -18,7 +19,7 @@ import os
 import random
 import json
 from werkzeug.utils import secure_filename
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Manager
 
 INVITES_PROCESS = {}
 
@@ -285,35 +286,45 @@ def status_changed_notif(email, name, surname, ins_status):
     p1.start()
 
 
+def mailing_wrapper(users: list, text: str, exam, arr: list):
+    async def async_mailing(users: list, text: str, exam, arr: list):
+        async def mailing(subj: str, email: str, text: str, arr: list, user_id):
+            mess = MIMEText(markdown.markdown(text), 'html')
+            mess['From'] = config['mail']
+            mess['To'] = email
+            mess['Subject'] = subj
+            await smtpObj.sendmail(config['mail'], email, mess.as_string())
+            arr.append(email)
+            notif = Notification(
+                user_id=user_id,
+                text=subj,
+                link='/invites'
+            )
+            notif.set_str_date()
+            db_sess.add(notif)
+
+        config = json.load(open('py_scripts/consts/mailer.json', mode='rb'))
+        smtpObj = aiosmtplib.SMTP(hostname='smtp.yandex.ru', port=587, timeout=60,
+                                  username=config['login'], password=config['password'],
+                                  validate_certs=False)
+        await smtpObj.connect()
+        db_sess = db_session.create_session()
+        tasks = []
+        for user in users:
+            tasks.append(
+                mailing(f'Приглашение на вступительное испытание {exam[0]} {exam[1]}',
+                        user[0], text.format(user[1]), arr, user[2])
+            )
+        await asyncio.gather(*tasks)
+        db_sess.commit()
+        db_sess.close()
+        await smtpObj.quit()
+
+    db_session.global_init('database/admission.db')
+    asyncio.run(async_mailing(users, text, exam, arr))
+
+
 def mailing_invites(users: list, text: str, exam, user):
-    def mailing_wrapper(users: list, text: str, exam, q: Queue):
-        async def async_mailing(users: list, text: str, exam, q: Queue):
-            async def mailing(subj: str, email: str, text: str, q: Queue):
-                mess = MIMEText(text, 'html')
-                mess['From'] = config['mail']
-                mess['To'] = email
-                mess['Subject'] = subj
-                await smtpObj.sendmail(config['mail'], email, mess.as_string())
-                q.put(email)
-
-            config = json.load(open('py_scripts/consts/mailer.json', mode='rb'))
-            smtpObj = aiosmtplib.SMTP(hostname='smtp.yandex.ru', port=587, timeout=10,
-                                      username=config['login'], password=config['password'],
-                                      validate_certs=False)
-            await smtpObj.connect()
-            tasks = []
-            for user in users:
-                tasks.append(
-                    mailing(f'Приглашение на вступительное испытание {exam[0]} {exam[1]}',
-                            user[0], text.format(user[1]), q)
-                )
-            await asyncio.gather(*tasks)
-            await smtpObj.quit()
-
-        asyncio.run(async_mailing(users, text, exam, q))
-        sleep(5)
-        INVITES_PROCESS.pop(user)
-
-    INVITES_PROCESS[user] = Queue()
-    p = Process(target=mailing_wrapper, args=(users, text, exam, INVITES_PROCESS[user]), daemon=True)
+    INVITES_PROCESS[user] = [Manager().list(), len(users), 3]
+    p = Process(target=mailing_wrapper, args=(users, text, exam, INVITES_PROCESS[user][0]), daemon=True)
     p.start()

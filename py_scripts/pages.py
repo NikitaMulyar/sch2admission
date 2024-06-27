@@ -299,7 +299,6 @@ class Pages:
                 info["CLASS"] = -1                 # part 1
                 info["PROFILE"] = ''               # part 1
                 info["EXAM_ID_NEW"] = -1           # part 2
-                info["INVITE_DESCRIPTION"] = ''    # part 2
                 info["EXAM_IDS_NEED"] = []         # part 2
                 info["LIMIT"] = -1                 # auto 1
                 info["PRIORITY"] = -1              # auto 1
@@ -327,8 +326,6 @@ class Pages:
                 form = InvitesForm.get_part_2(**info)
                 if info["EXAM_ID_NEW"] != -1:
                     form.exam.data = info["EXAM_ID_NEW"]
-                if info["INVITE_DESCRIPTION"] != '':
-                    form.invite_description.data = info["INVITE_DESCRIPTION"]
                 if info["EXAM_IDS_NEED"] != []:
                     for ex in info["EXAM_IDS_NEED"]:
                         form.__getattribute__(f'exam_need_{ex[0]}').data = True
@@ -342,7 +339,7 @@ class Pages:
                     must_fill_these_fields()
                     return redirect('/inviting/1')
 
-                if info['EXAM_ID_NEW'] == -1 or info['INVITE_DESCRIPTION'] == '':
+                if info['EXAM_ID_NEW'] == -1:
                     must_fill_these_fields()
                     return redirect('/inviting/2')
 
@@ -368,7 +365,7 @@ class Pages:
                     must_fill_these_fields()
                     return redirect('/inviting/1')
 
-                if info['EXAM_ID_NEW'] == -1 or info['INVITE_DESCRIPTION'] == '':
+                if info['EXAM_ID_NEW'] == -1:
                     must_fill_these_fields()
                     return redirect('/inviting/2')
 
@@ -386,7 +383,7 @@ class Pages:
                     must_fill_these_fields()
                     return redirect('/inviting/1')
 
-                if info['EXAM_ID_NEW'] == -1 or info['INVITE_DESCRIPTION'] == '':
+                if info['EXAM_ID_NEW'] == -1:
                     must_fill_these_fields()
                     return redirect('/inviting/2')
 
@@ -421,7 +418,6 @@ class Pages:
                 print(form.type_of_constructor.data)
                 if form.validate_on_submit():
                     info['EXAM_ID_NEW'] = form.exam.data
-                    info['INVITE_DESCRIPTION'] = form.invite_description.data
                     info['EXAM_IDS_NEED'] = []
                     for ex_id in form.exams_need_ids:
                         ex_ = getattr(form, f'exam_need_{ex_id}')
@@ -474,7 +470,7 @@ class Pages:
                             info['STUDENTS_IDS'].append(user_id)
                     json.dump(info, open(path_, mode='w'))
 
-                    return redirect('/inviting/end')
+                    return redirect('/inviting/end/end')
                 return render_template('inviting_form/partA2.html',
                                        **generate_data_for_base('/inviting', 'Создание приглашений на '
                                                                              'вступительные испытания'),
@@ -490,7 +486,7 @@ class Pages:
                             info['STUDENTS_IDS'].append(user_id)
                     json.dump(info, open(path_, mode='w'))
 
-                    return redirect('/inviting/end')
+                    return redirect('/inviting/end/end')
                 return render_template('inviting_form/partM.html',
                                        **generate_data_for_base('/inviting', 'Создание приглашений на '
                                                                              'вступительные испытания'),
@@ -504,17 +500,36 @@ class Pages:
         if not os.path.exists(path_) and not INVITES_PROCESS.get(current_user.id):
             return redirect('/inviting/1')
         if not os.path.exists(path_) and INVITES_PROCESS.get(current_user.id):
-            # Pдесь должна быть красота типа, пока ждем рассылку
+            if INVITES_PROCESS[current_user.id][2] == 0:
+                INVITES_PROCESS.pop(current_user.id)
+                return redirect('/inviting/1')
+
+            db_sess = db_session.create_session()
+            arr = []
+            for email in INVITES_PROCESS[current_user.id][0]:
+                user = db_sess.query(User).where(User.email == email).first()
+                arr.append(
+                    (f'{user.surname} {user.name} {user.third_name} ({user.email})', user.id)
+                )
+            db_sess.close()
+
+            arr = sorted(arr, key=lambda a: a[0].split())
+            data = [arr.copy(), INVITES_PROCESS[current_user.id][1]]
+
+            if INVITES_PROCESS[current_user.id][1] == len(arr):
+                INVITES_PROCESS[current_user.id][2] = INVITES_PROCESS[current_user.id][2] - 1
+
             return render_template('inviting_form/mailing_part.html',
                                    **generate_data_for_base('/inviting', 'Создание приглашений на '
-                                                                         'вступительные испытания'))
+                                                                         'вступительные испытания'),
+                                   data=data)
 
         info = json.load(open(path_, mode='rb'))
         if info["STUDENTS_IDS"] == []:
             db_sess = db_session.create_session()
             notif = Notification(
                 user_id=current_user.id,
-                text=f'Вы не указали некоторые поля в форме. Проверьте, пожалуйста, еще раз.',
+                text=f'Вы не указали некоторые поля в форме. Проверьте, пожалуйста, ее еще раз.',
                 type='warn'
             )
             notif.set_str_date()
@@ -527,12 +542,16 @@ class Pages:
         users = db_sess.query(User).filter(User.id.in_(info["STUDENTS_IDS"])).all()
         users_ = []
         for user in users:
-            users_.append((user.email, f'{user.name} {user.surname}'))
+            users_.append((user.email, f'{user.name} {user.surname}', user.id))
         exam = db_sess.query(Exam).get(info["EXAM_ID_NEW"])
+        invite_description = '## Уважаемый(ая) {}!\n\n' + exam.exam_description
         exam = (exam.date.strftime('%d.%m'), exam.title)
         db_sess.close()
-        mailing_invites(users_, info["INVITE_DESCRIPTION"], exam, current_user.id)
+        mailing_invites(users_, invite_description, exam, current_user.id)
         os.remove(path_)
+
+        data = [[], len(users_)]
         return render_template('inviting_form/mailing_part.html',
                                **generate_data_for_base('/inviting', 'Создание приглашений на '
-                                                                     'вступительные испытания'))
+                                                                     'вступительные испытания'),
+                               data=data)

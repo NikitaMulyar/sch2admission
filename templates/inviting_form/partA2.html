@@ -33,8 +33,8 @@
             <b>Предварительный список приглашенных ({{ form.students_ids|length }} человек):</b>
             <p class="description_form">Вы можете вручную исключить некоторых приглашенных, сняв с них галочку.</p>
             {% for user_id in form.students_ids %}
-                <p class="exams-need-list">
-                    {{ loop.index }}. {{ form.__getattribute__("student_{}".format(user_id))(class_="checkbox") }} {{ form.__getattribute__("student_{}".format(user_id)).label }}
+                <p class="p-style" style="margin-bottom: 10px;">
+                    {{ loop.index }}. {{ form.__getattribute__("student_{}".format(user_id))(class_="checkbox") }} {{ form.__getattribute__("student_{}".format(user_id)).label }} <a href="/users/{{ user_id }}" class="btn btn-primary">Подробнее</a>
                 </p>
             {% endfor %}
         </p>

@@ -160,14 +160,6 @@ class InvitesForm:
             exam = SelectField('Выберите экзамен, на который создаются приглашения', coerce=int, choices=[],
                                validators=[InputRequired('Обязательное поле')],
                                description='Нажмите на поле, чтобы выбрать экзамен.')
-            invite_description = TextAreaField('Введите описание приглашения',
-                                               description='Чтобы при рассылке можно было подставить ФИО поступающего, '
-                                                           'вместо ФИО используйте "{}" (без кавычек). Использовать '
-                                                           'их можно в тексте лишь 1 раз. '
-                                                           'Для форматирования текста применяйте Markdown: '
-                                                           '<a target="_blank" href="https://www.markdownguide.org/'
-                                                           'basic-syntax/#emphasis">Пример</a>',
-                                               validators=[InputRequired('Обязательное поле')])
             type_of_constructor = SelectField('Выберите тип конструктора',
                                               choices=[(0, 'Полуавтоматический'), (1, 'Ручной')], coerce=int,
                                               validators=[InputRequired('Обязательное поле')],
@@ -281,7 +273,7 @@ class InvitesForm:
         goods = goods[:limit]
         setattr(PartAuto2, 'students_ids', list())
         for user in goods:
-            ex_ = BooleanField(f'{user.surname} {user.name} {user.third_name}')
+            ex_ = BooleanField(f'{user.surname} {user.name} {user.third_name} ({user.email})')
             setattr(PartAuto2, f'student_{user.id}', ex_)
             setattr(PartAuto2, 'students_ids', getattr(PartAuto2, 'students_ids') + [user.id])
         return PartAuto2()
@@ -321,7 +313,7 @@ class InvitesForm:
         goods = sorted(goods, key=lambda x: (x.surname, x.name, x.third_name))
         setattr(PartManual, 'students_ids', list())
         for user in goods:
-            ex_ = BooleanField(f'{user.surname} {user.name} {user.third_name}')
+            ex_ = BooleanField(f'{user.surname} {user.name} {user.third_name} ({user.email})')
             setattr(PartManual, f'student_{user.id}', ex_)
             setattr(PartManual, 'students_ids', getattr(PartManual, 'students_ids') + [user.id])
         return PartManual()

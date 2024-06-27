@@ -47,25 +47,10 @@
             Выберите экзамены, "ЗАЧЕТ" на хотя бы одном из которых необходим для участия в новом экзамене
             <p class="description_form">Вы можете не выбирать экзамен - тогда при подборе поступающих этот критерий учитываться не будет.</p>
             {% for exam_id in form.exams_need_ids %}
-                <p class="exams-need-list">
+                <p class="p-style" style="margin-bottom: 10px;">
                     {{ form.__getattribute__("exam_need_{}".format(exam_id))(class_="checkbox") }} {{ form.__getattribute__("exam_need_{}".format(exam_id)).label }}
                 </p>
             {% endfor %}
-        </p>
-        <p>
-            {{ form.invite_description.label }}
-        <div class="description_form">{{ form.invite_description.description|safe }}</div>
-        {{ form.invite_description(class="form-control", rows="5") }}
-        {% for error in form.invite_description.errors %}
-            <div class="alert alert-danger d-flex align-items-center" role="alert" style="margin-top: 5px !important;">
-                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
-                    <use xlink:href="#exclamation-triangle-fill"/>
-                </svg>
-                <div>
-                    {{ error }}
-                </div>
-            </div>
-        {% endfor %}
         </p>
         <p>
             {{ form.type_of_constructor.label }}

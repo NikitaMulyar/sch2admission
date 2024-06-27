@@ -111,10 +111,11 @@ tr.spaceUnder>td {
     justify-content: center;
 }
 
-.exams-need-list {
-    margin: auto;
-}
-
 #buttons-style {
     font-size: 18px !important;
+}
+
+#progress-bar-1 {
+    width: 80%;
+    margin: auto;
 }
