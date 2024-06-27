@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="h2-style"><b>{{ title }}</b></h2><br>
+<link rel="stylesheet" href="/static/css/style2.css"/>
+
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.0/bootstrap-table.min.css'>
+<link rel='stylesheet'
+      href='https://rawgit.com/vitalets/x-editable/master/dist/bootstrap3-editable/css/bootstrap-editable.css'>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+      integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.0/bootstrap-table.js'></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.css"/>
+<script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
+<!--<link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.css"/>-->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
+<script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js">
+</script>
+
+<script src="/static/js/users_table.js"></script>
+
+<div class="container">
+    <div class="form-group pull-left">
+        <form>
+            <input type="text" name="focus" required class="search-box search form-control" placeholder="Поиск"/>
+            <button class="close-icon" type="reset"></button>
+        </form>
+    </div>
+    <span class="counter pull-right"></span>
+    <table id="example" class="table results table-hover"
+           data-escape="false"
+           data-toggle="table"
+           data-filter-control="true">
+        <thead class="thead-light">
+        <tr>
+            <th scope="col" data-field="name" data-sortable="true">ФИО поступающего</th>
+            <th scope="col" data-field="mail" data-sortable="true">Почта</th>
+            <th scope="col" data-field="grade" data-sortable="true">Класс поступления</th>
+            <th scope="col" data-field="status" data-sortable="true">Статус</th>
+            <th scope="col" data-field="more">Подробнее</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="table-warning no-result">
+            <td colspan="5">Нет результатов</td>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>
+                <div class="media align-items-center" style="display: flex;align-items: flex-start;">
+                    <img alt="Image placeholder" src="/static/img/logo.png" style="width: 40px; height: 40px;">
+                    <span class="fs-6">{{ user[0] }}</span>
+                </div>
+            </td>
+            <td>{{ user[1] }}</td>
+            <td>{{ user[2] }}</td>
+            {% if user[3] == "Участвуете в конкурсе" %}
+            <td class="status"><span class="take_part">{{ user[3] }}</span></td>
+            {% elif user[3] == "Выбыли из конкурса" %}
+            <td class="status"><span class="dont_take_part">{{ user[3] }}</span></td>
+            {% elif user[3] == "Приняты в Лицей" %}
+            <td class="status"><span class="in_lyceum">{{ user[3] }}</span></td>
+            {% elif user[3] == "Занесены в резерв" %}
+            <td class="status"><span class="reserve">{{ user[3] }}</span></td>
+            {% elif user[3] == "Заявка отклонена" %}
+            <td class="status"><span class="cancel">{{ user[3] }}</span></td>
+            {% else %}
+            <td class="status"><span class="waiting">{{ user[3] }}</span></td>
+            {% endif %}
+            <td>
+                <div class="d-flex justify-content-center">
+                    <button type="button" class="btn btn-primary"><i class="far fa-eye"></i></button>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

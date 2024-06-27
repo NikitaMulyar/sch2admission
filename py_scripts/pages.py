@@ -6,6 +6,7 @@ from sa_models import db_session
 from sa_models.exams import Exam
 from sa_models.notifications import Notification
 from py_scripts.forms import ExamCreateForm
+from sa_models.users import User
 
 from markupsafe import Markup
 
@@ -18,6 +19,7 @@ class Pages:
         app.add_endpoint('/results', 'back_results', self.back_results)
         app.add_endpoint('/contacts', 'back_contacts', self.back_contacts)
         app.add_endpoint('/exams', 'back_exams', self.back_exams)
+        app.add_endpoint('/participants', 'table_of_users', self.table_of_users)
         app.add_endpoint('/exams/<exam_id>', 'back_exam_info', self.back_exam_info, methods=['GET', 'POST'])
 
     @staticmethod
@@ -26,6 +28,7 @@ class Pages:
             if current_user.is_authenticated and current_user.role == 'admin':
                 return redirect('/')
             return func(*args, **kwargs)
+
         return wrapper
 
     @staticmethod
@@ -34,6 +37,7 @@ class Pages:
             if current_user.is_authenticated and current_user.role != 'admin':
                 return redirect('/')
             return func(*args, **kwargs)
+
         return wrapper
 
     @staticmethod
@@ -56,7 +60,8 @@ class Pages:
                 ("Поступает в", f"{current_user.class_number} "
                                 f"{current_user.profile_10_11.lower() if current_user.class_number >= 10 else ''} класс"),
                 ("Школа", current_user.school),
-                ("Родитель", f"{current_user.parent_surname} {current_user.parent_name} {current_user.parent_third_name}"),
+                ("Родитель",
+                 f"{current_user.parent_surname} {current_user.parent_name} {current_user.parent_third_name}"),
                 ("Телефон", current_user.parent_phone_number),
                 ("О себе", current_user.about if current_user.about else '-')
             ]
@@ -104,7 +109,7 @@ class Pages:
             arr.append(exam.date.strftime("%H:%M, %d.%m.%Y"))
             exams_list.append(arr)
         return render_template('exams.html', **generate_data_for_base('/exams',
-                                                                        'Вступительные испытания'),
+                                                                      'Вступительные испытания'),
                                exams_list=exams_list)
 
     @staticmethod
@@ -138,6 +143,24 @@ class Pages:
                 db_sess.close()
                 return redirect('/exams')
             return render_template('exam_creating.html', **generate_data_for_base('/exams/create',
-                                                                          'Создание нового вступительного испытания'),
+                                                                                  'Создание нового вступительного испытания'),
                                    form=form)
         # МАТВЕЙ, ТУТ ТВОИ ОБРАБОТЧИКИ
+
+    @staticmethod
+    @login_required
+    @non_admin_forbidden
+    def table_of_users():
+        statuses = json.load(open('py_scripts/consts/contest_statuses.json', mode='rb'))
+        db_sess = db_session.create_session()
+        kwargs = dict()
+        kwargs["users"] = []
+        users = db_sess.query(User).all()
+        kwargs["options_1"] = {i + 1: el for i, el in enumerate(statuses)}
+        kwargs["options_2"] = {i + 1: el for i, el in enumerate(range(6, 12))}
+        for el in users:
+            if el.role != "admin":
+                kwargs["users"].append(
+                    [el.surname + el.name + el.third_name, el.email, el.class_number, statuses[el.status]])
+        return render_template('table_of_users.html',
+                               **generate_data_for_base("/participants", title="Список поступающих"), **kwargs)
