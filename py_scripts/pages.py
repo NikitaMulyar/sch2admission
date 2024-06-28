@@ -160,7 +160,18 @@ class Pages:
         kwargs["options_2"] = {i + 1: el for i, el in enumerate(range(6, 12))}
         for el in users:
             if el.role != "admin":
+                for_modal = [("ФИО", f"{el.surname} {el.name} {el.third_name}"), ("Эл. почта", el.email)]
+                if el.class_number >= 10:
+                    for_modal.append(("Класс поступления", f"{el.class_number}, {el.profile_10_11} профиль"))
+                else:
+                    for_modal.append(("Класс поступления", el.class_number))
+                for_modal.extend(
+                    [("Дата рождения", el.birth_date), ("Статус участия", statuses[el.status]), ("Школа", el.school),
+                     ("Контакты родителя",
+                      f"{el.parent_surname} {el.parent_name} {el.parent_third_name}, {el.parent_phone_number}")])
+
                 kwargs["users"].append(
-                    [el.surname + el.name + el.third_name, el.email, el.class_number, statuses[el.status]])
+                    [f"{el.surname} {el.name} {el.third_name}", el.email, el.class_number, statuses[el.status],
+                     for_modal])
         return render_template('table_of_users.html',
                                **generate_data_for_base("/participants", title="Список поступающих"), **kwargs)

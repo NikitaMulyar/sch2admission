@@ -38,6 +38,19 @@ new DataTable('#example', {
       "lengthMenu": "Количество на странице  _MENU_"
    }
 });
+$("#example").bootstrapTable("hideLoading");
 });
 
 
+//
+//var exampleModal = document.getElementById('modal_users')
+//exampleModal.addEventListener('show.bs.modal', function (event) {
+//  // Button that triggered the modal
+//  var button = event.relatedTarget
+//  var recipient = button.getAttribute('data-bs-whatever')
+//  var modalBodyInput = exampleModal.querySelector('.modal-body input')
+//  modalBodyInput.value = recipient
+//})
+//
+//
+//

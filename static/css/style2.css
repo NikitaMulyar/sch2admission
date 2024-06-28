@@ -199,3 +199,16 @@ margin-left: 5px;
     border: 2px solid #D79922 !important;
     border-radius: 5px;
 }
+
+.container div.dt-container .dt-paging .dt-paging-button {
+  border-radius: 0.6rem;
+  background: #ffffff;
+  box-shadow: 0 0.8rem 2rem rgba(#5a6181, 0.05);
+  color: #23adade1 !important;
+}
+.container div.dt-container .dt-paging .dt-paging-button.current {
+color: #ffffff !important;
+      background: #23adad;
+      font-weight: 600;
+      border: 1px solid #23adad;
+}
