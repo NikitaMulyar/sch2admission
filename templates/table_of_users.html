@@ -22,6 +22,15 @@
             <button class="close-icon" type="reset"></button>
         </form>
     </div>
+    <form method="post">
+        {% for grade in grades %}
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" name="grade" type="checkbox" id="inlineCheckbox1" value="{{ grade }}">
+            <label class="form-check-label" for="inlineCheckbox1">{{ grade }} класс</label>
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Показать</button>
+    </form>
     <span class="counter pull-right"></span>
     <table id="example" class="table results table-hover"
            data-escape="false"
@@ -78,7 +87,6 @@
 </div>
 
 
-
 {% for i in range(users|length) %}
 <div id="modal-users-{{ i }}" class="modal fade" data-backdrop="true">
     <div class="modal-dialog modal-xl modal-users">
@@ -94,19 +102,19 @@
                     <tr>
                         <th scope="row" style="width: 30%">{{ row[0] }}</th>
                         {% if loop.index == 5 %}
-                            {% if row[1] == "Участвуете в конкурсе" %}
-                            <td class="status"><span class="take_part">{{ row[1] }}</span></td>
-                            {% elif row[1]== "Выбыли из конкурса" %}
-                            <td class="status"><span class="dont_take_part">{{ row[1] }}</span></td>
-                            {% elif row[1] == "Приняты в Лицей" %}
-                            <td class="status"><span class="in_lyceum">{{ row[1] }}</span></td>
-                            {% elif row[1] == "Занесены в резерв" %}
-                            <td class="status"><span class="reserve">{{ row[1] }}</span></td>
-                            {% elif row[1] == "Заявка отклонена" %}
-                            <td class="status"><span class="cancel">{{ row[1] }}</span></td>
-                            {% else %}
-                            <td class="status"><span class="waiting">{{ row[1] }}</span></td>
-                            {% endif %}
+                        {% if row[1] == "Участвуете в конкурсе" %}
+                        <td class="status"><span class="take_part">{{ row[1] }}</span></td>
+                        {% elif row[1]== "Выбыли из конкурса" %}
+                        <td class="status"><span class="dont_take_part">{{ row[1] }}</span></td>
+                        {% elif row[1] == "Приняты в Лицей" %}
+                        <td class="status"><span class="in_lyceum">{{ row[1] }}</span></td>
+                        {% elif row[1] == "Занесены в резерв" %}
+                        <td class="status"><span class="reserve">{{ row[1] }}</span></td>
+                        {% elif row[1] == "Заявка отклонена" %}
+                        <td class="status"><span class="cancel">{{ row[1] }}</span></td>
+                        {% else %}
+                        <td class="status"><span class="waiting">{{ row[1] }}</span></td>
+                        {% endif %}
                         {% else %}
                         <td>{{ row[1] }}</td>
                         {% endif %}
