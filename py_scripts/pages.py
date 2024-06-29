@@ -7,6 +7,8 @@ from sa_models.exams import Exam
 from sa_models.notifications import Notification
 from py_scripts.forms import ExamCreateForm
 from sa_models.users import User
+from sa_models.invites import Invite
+from sqlalchemy import desc
 
 from markupsafe import Markup
 
@@ -151,19 +153,27 @@ class Pages:
     @login_required
     @non_admin_forbidden
     def table_of_users():
-        grades = [i for i in range(6, 12)]
+        kwargs = dict()
+        kwargs["checked_grades"] = [i for i in range(6, 12)]
         if request.method == "POST" and request.form.getlist('grade'):
-            grades = [int(el) for el in request.form.getlist('grade')]
+            kwargs["checked_grades"] = [int(el) for el in request.form.getlist('grade')]
         statuses = json.load(open('py_scripts/consts/contest_statuses.json', mode='rb'))
         db_sess = db_session.create_session()
-        kwargs = dict()
+
+        import datetime
+        inv1 = Invite(user_id=2, exam_id=1, made_on=datetime.datetime(year=2024, day=29, month=6))
+        db_sess.add(inv1)
+        inv1 = Invite(user_id=2, exam_id=1, made_on=datetime.datetime(year=2024, day=30, month=6))
+        db_sess.add(inv1)
+        db_sess.commit()
+
         kwargs["users"] = []
         users = db_sess.query(User).all()
         kwargs["options_1"] = {i + 1: el for i, el in enumerate(statuses)}
         kwargs["options_2"] = {i + 1: el for i, el in enumerate(range(6, 12))}
         kwargs["grades"] = [i for i in range(6, 12)]
         for el in users:
-            if el.role != "admin" and el.class_number in grades:
+            if el.role != "admin" and el.class_number in kwargs["checked_grades"]:
                 for_modal = [("ФИО", f"{el.surname} {el.name} {el.third_name}"), ("Эл. почта", el.email)]
                 if el.class_number >= 10:
                     for_modal.append(("Класс поступления", f"{el.class_number}, {el.profile_10_11} профиль"))
@@ -174,8 +184,17 @@ class Pages:
                      ("Контакты родителя",
                       f"{el.parent_surname} {el.parent_name} {el.parent_third_name}, {el.parent_phone_number}")])
 
+                exams = db_sess.query(Invite).filter(Invite.user_id == el.id).order_by(desc(Invite.made_on)).all()
+                for_exam = []
+                for exam in exams:
+                    for_exam.append({"ID": exam.exam_id, "Название экзамена": exam.parent_exam.title,
+                                     "Дата": exam.parent_exam.date,
+                                     "Описание экзамена": exam.parent_exam.exam_description,
+                                     "Результат": exam.result,
+                                     "Описание результата": exam.result_description})
+
                 kwargs["users"].append([f"{el.surname} {el.name} {el.third_name}", el.email, el.class_number,
-                                        statuses[el.status], for_modal])
+                                        statuses[el.status], for_modal, for_exam])
 
         return render_template('table_of_users.html',
                                **generate_data_for_base("/participants", title="Список поступающих"), **kwargs)

@@ -25,7 +25,11 @@
     <form method="post">
         {% for grade in grades %}
         <div class="form-check form-check-inline">
+            {% if grade in checked_grades %}
+            <input class="form-check-input" name="grade" type="checkbox" id="inlineCheckbox1" value="{{ grade }}" checked>
+            {% else %}
             <input class="form-check-input" name="grade" type="checkbox" id="inlineCheckbox1" value="{{ grade }}">
+            {% endif %}
             <label class="form-check-label" for="inlineCheckbox1">{{ grade }} класс</label>
         </div>
         {% endfor %}
