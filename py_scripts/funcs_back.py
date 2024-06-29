@@ -328,3 +328,37 @@ def mailing_invites(users: list, text: str, exam, user):
     INVITES_PROCESS[user] = [Manager().list(), len(users), 3]
     p = Process(target=mailing_wrapper, args=(users, text, exam, INVITES_PROCESS[user][0]), daemon=True)
     p.start()
+
+
+def mailing_wrapper_posts(users: list, note):
+    async def async_mailing(users: list, note):
+        async def mailing(subj: str, email: str, text: str):
+            mess = MIMEText(text, 'html')
+            mess['From'] = config['mail']
+            mess['To'] = email
+            mess['Subject'] = subj
+            await smtpObj.sendmail(config['mail'], email, mess.as_string())
+
+        config = json.load(open('py_scripts/consts/mailer.json', mode='rb'))
+        smtpObj = aiosmtplib.SMTP(hostname='smtp.yandex.ru', port=587, timeout=60,
+                                  username=config['login'], password=config['password'],
+                                  validate_certs=False)
+        await smtpObj.connect()
+        tasks = []
+        link = f'http://127.0.0.1:8080/#note-{note[0]}'
+        for user in users:
+            tasks.append(
+                mailing(f'Новая публикация от приемной комиссии: "{note[1]}"',
+                        user, f'<h2>Добрый день!</h2>'
+                              f'Для просмотра записи перейдите по ссылке: '
+                              f'<h3><a href="{link}">{link}</a></h3>')
+            )
+        await asyncio.gather(*tasks)
+        await smtpObj.quit()
+
+    asyncio.run(async_mailing(users, note))
+
+
+def mailing_posts(users, note):
+    p = Process(target=mailing_wrapper_posts, args=(users, note), daemon=True)
+    p.start()

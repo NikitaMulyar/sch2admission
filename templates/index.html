@@ -1,7 +1,55 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2 class="h2-style"><b>Главная</b></h2><br>
-    <h3>Добро пожаловать на сайт для поступающих в Лицей "Вторая Школа"!</h3>
-    <p class="p-style">Скоро начнутся <b>Экзамены!</b></p>
+<h1 class="h1-style"><b>{{ title }}</b></h1><br>
+    <h3 style="text-align: center;">Добро пожаловать на сайт для поступающих в Лицей "Вторая Школа"!</h3>
+    {% if current_user.role == "admin" %}
+        <a href="/newnote" class="btn btn-success" style="margin-top: 10px; margin-bottom: 10px;" id="buttons-style">Создать запись</a>
+    {% endif %}
+    {% if not notes %}
+    <p style="text-align: center; color: #343434;">Здесь будут объявления от приемной комисии.</p>
+    {% else %}
+        {% for note in notes %}
+            {% set if_edited = "" %}
+            {% if note[4] %}
+                {% set if_edited = "(ред. {})".format(note[4]) %}
+            {% endif %}
+            <div class="note" id="note-{{ note[0] }}">
+                <div class="note-content">
+                    <h4 style="margin-bottom: -5px; color: #464866;"><b>{{ note[1] }}</b></h4>
+                    <small class="text-body-secondary">Создано: {{ note[3] }} {{ if_edited }}</small><br>
+                    <div class="p-style" style="margin-top: 5px;">
+                        {{ note[2]|safe }}
+                    </div>
+                    <p class="p-style" style="margin-bottom: -5px;">Автор: {{ note[5] }}</p>
+                    {% if current_user.role == "admin" %}
+                        <a href="/editnote/{{ note[0] }}" class="btn btn-warning"
+                           style="margin-top: 10px; margin-bottom: 10px;" id="buttons-style">Редактировать</a>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                data-bs-target="#exampleModal{{ note[0] }}" id="buttons-style">
+                            Удалить
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="modal fade" id="exampleModal{{ note[0] }}" tabindex="-1" aria-labelledby="exampleModalLabel{{ note[0] }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel{{ note[0] }}">Вы уверены?</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Данная запись будет безвозвратно удалена!
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отменить</button>
+                            <a href="/deletenote/{{ note[0] }}" class="btn btn-danger">Все равно удалить</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
 {% endblock %}

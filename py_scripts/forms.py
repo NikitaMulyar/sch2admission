@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import EmailField, PasswordField, SubmitField, BooleanField, StringField, FileField, \
     DateField, TextAreaField, SelectField, TelField, DateTimeLocalField, IntegerField
-from wtforms.validators import Optional, InputRequired, ValidationError
+from wtforms.validators import Optional, InputRequired, ValidationError, DataRequired
 from flask_wtf.file import FileAllowed, FileRequired
 import phonenumbers
 
@@ -74,7 +74,7 @@ class RegisterFormClasses8To11(RegisterFormClasses6To7):
                                validators=[InputRequired('Обязательное поле')], coerce=int,
                                description='Нажмите на поле, чтобы выбрать класс.')
     profile = SelectField('Выберите профиль, в который Вы хотите поступить',
-                          choices=json.load(open("py_scripts/consts/profiles.json")),
+                          choices=json.load(open("py_scripts/consts/profiles.json", mode='rb')),
                           validators=[InputRequired('Обязательное поле')],
                           description='Нажмите на поле, чтобы выбрать профиль.')
 
@@ -106,7 +106,7 @@ class ExamCreateForm(FlaskForm):
                                validators=[InputRequired('Обязательное поле')],
                                description='Нажмите на поле, чтобы выбрать класс.')
     profile = SelectField('Выберите для какого профиля экзамен',
-                          choices=json.load(open("py_scripts/consts/profiles.json")),
+                          choices=json.load(open("py_scripts/consts/profiles.json", mode='rb')),
                           validators=[InputRequired('Обязательное поле')],
                           description='Нажмите на поле, чтобы выбрать профиль.')
     exam_description = TextAreaField('Введите описание экзамена',
@@ -148,7 +148,7 @@ class InvitesForm:
                                        validators=[InputRequired('Обязательное поле')], coerce=int,
                                        description='Нажмите на поле, чтобы выбрать класс.')
             profile = SelectField('Выберите для какого профиля экзамен',
-                                  choices=json.load(open("py_scripts/consts/profiles.json")),
+                                  choices=json.load(open("py_scripts/consts/profiles.json", mode='rb')),
                                   validators=[InputRequired('Обязательное поле')],
                                   description='Нажмите на поле, чтобы выбрать профиль.')
             forward = SubmitField('Далее')
@@ -317,3 +317,40 @@ class InvitesForm:
             setattr(PartManual, f'student_{user.id}', ex_)
             setattr(PartManual, 'students_ids', getattr(PartManual, 'students_ids') + [user.id])
         return PartManual()
+
+
+class NotesForm:
+    @staticmethod
+    def get_form():
+        class Form(FlaskForm):
+            title = StringField('Напишите заголовок', validators=[InputRequired('Обязательное поле')])
+            text = TextAreaField('Напишите текст записи',
+                                 description='Для форматирования текста применяйте Markdown: '
+                                             '<a target="_blank" href="https://www.markdownguide.org/basic-syntax/'
+                                             '#emphasis">Пример</a>',
+                                 validators=[InputRequired('Обязательное поле')])
+            email_notification = BooleanField('Отправить уведомления по почте')
+            site_notification = BooleanField('Отправить уведомления на сайте')
+            for_everyone = BooleanField('Для всех (в том числе и незарегистрированные люди)')
+            submit = SubmitField('Опубликовать')
+
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                if not self.validate_on_submit():
+                    for class_id in self.classes_ids:
+                        ex_ = getattr(self, f'class_{class_id}')
+                        ex_.data = False
+                        setattr(self, f'class_{class_id}', ex_)
+
+        setattr(Form, 'classes_ids', list())
+        profiles = json.load(open("py_scripts/consts/profiles.json", mode='rb'))
+        for class_ in range(6, 10):
+            ex_ = BooleanField(f'{class_} класс')
+            setattr(Form, f'class_{class_}', ex_)
+            setattr(Form, 'classes_ids', getattr(Form, 'classes_ids') + [class_])
+        for class_ in range(10, 12):
+            for i in range(len(profiles)):
+                ex_ = BooleanField(f'{class_} {profiles[i]} класс')
+                setattr(Form, f'class_{class_}_{i}', ex_)
+                setattr(Form, 'classes_ids', getattr(Form, 'classes_ids') + [f'{class_}_{i}'])
+        return Form()

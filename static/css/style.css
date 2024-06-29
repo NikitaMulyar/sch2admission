@@ -60,7 +60,7 @@
     margin-top: 40%;
 }
 
-.h2-style{
+.h1-style{
     color: #464866;
     text-align: center;
     margin: auto;
@@ -118,4 +118,14 @@ tr.spaceUnder>td {
 #progress-bar-1 {
     width: 80%;
     margin: auto;
+}
+
+.note {
+    border: 2px dotted #464866;
+    margin: auto;
+    margin-bottom: 36px;
+}
+
+.note-content {
+    padding: 10px;
 }

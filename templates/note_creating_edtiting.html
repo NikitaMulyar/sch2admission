@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 class="h1-style"><b>{{ title }}</b></h1><br>
+    <h1 class="h1-style"><b>{{ title }}</b></h1><br>
     <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
     <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
         <symbol id="check-circle-fill" viewBox="0 0 16 16">
@@ -28,20 +28,57 @@
                 </div>
             </div>
         {% endif %}
-
         <p>
-            <b>Предварительный список приглашенных ({{ form.students_ids|length }} человек):</b>
-        <p class="description_form">Вы можете вручную исключить некоторых приглашенных, сняв с них галочку.</p>
-            {% for user_id in form.students_ids %}
+            {{ form.title.label }}
+        <div class="description_form">{{ form.title.description }}</div>
+        {{ form.title(class="form-control") }}
+        {% for error in form.title.errors %}
+            <div class="alert alert-danger d-flex align-items-center" role="alert" style="margin-top: 5px !important;">
+                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
+                    <use xlink:href="#exclamation-triangle-fill"/>
+                </svg>
+                <div>
+                    {{ error }}
+                </div>
+            </div>
+        {% endfor %}
+        </p>
+        <p>
+            {{ form.text.label }}
+        <div class="description_form">{{ form.text.description|safe }}</div>
+        {{ form.text(class="form-control", rows="5") }}
+        {% for error in form.text.errors %}
+            <div class="alert alert-danger d-flex align-items-center" role="alert" style="margin-top: 5px !important;">
+                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
+                    <use xlink:href="#exclamation-triangle-fill"/>
+                </svg>
+                <div>
+                    {{ error }}
+                </div>
+            </div>
+        {% endfor %}
+        </p>
+        {% if current == '/newnote' %}
+            <p>
+                {{ form.email_notification(class_="checkbox") }} {{ form.email_notification.label }}
+            </p>
+            <p>
+                {{ form.site_notification(class_="checkbox") }} {{ form.site_notification.label }}
+            </p>
+        {% endif %}
+        <p>
+            Выберите классы, для которых предназначена публикация
+            <p class="p-style" style="margin-bottom: 10px;">
+                {{ form.for_everyone(class_="checkbox", id="all-classes") }} {{ form.for_everyone.label }}
+            </p>
+            {% for class_ in form.classes_ids %}
                 <p class="p-style" style="margin-bottom: 10px;">
-                    {{ loop.index }}. {{ form.__getattribute__("student_{}".format(user_id))(class_="checkbox") }} {{ form.__getattribute__("student_{}".format(user_id)).label }} <a href="/users/{{ user_id }}" class="btn btn-primary">Подробнее</a>
+                    {{ form.__getattribute__("class_{}".format(class_))(class_="checkbox class-field") }} {{ form.__getattribute__("class_{}".format(class_)).label }}
                 </p>
             {% endfor %}
         </p>
-        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal" id="buttons-style">
-            Назад
-        </button>
-        {{ form.forward(type="submit", class="btn btn-success", **{"id": "myBtn"}) }}
+
+        {{ form.submit(type="submit", class="btn btn-success", **{"id": "myBtn"}) }}
         <div class="collapse" id="collapseExample">
             <div class="card card-body"
                  style="display: flex !important;  flex-direction: row  !important;  justify-content: flex-start  !important;">
@@ -53,24 +90,7 @@
                 </div>
             </div>
         </div>
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">Вы уверены?</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        Если Вы перейдете на прошлую страницу, введенные данные на этой странице могут <b>НЕ сохраниться</b>!
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Остаться</button>
-                        <a href="/inviting/2" class="btn btn-primary">Все равно перейти</a>
-                    </div>
-                </div>
-            </div>
-        </div>
 
     </form>
-    <script src="/static/js/inviting_part1.js"></script>
+    <script src="/static/js/post_creating.js"></script>
 {% endblock %}

@@ -1,15 +1,19 @@
+import datetime
 import os
 
+import markdown
 from flask import render_template, request, make_response, redirect, abort
 from flask_login import current_user, login_required
 import json
 from py_scripts.funcs_back import generate_data_for_base, status_changed_notif, mailing_invites, INVITES_PROCESS
+from py_scripts.funcs_back import mailing_posts
 from sa_models import db_session
 from sa_models.exams import Exam
 from sa_models.invites import Invite
+from sa_models.notes import Note
 from sa_models.notifications import Notification
 from py_scripts.forms import ExamCreateForm, ExamStatusesForm
-from py_scripts.forms import InvitesForm
+from py_scripts.forms import InvitesForm, NotesForm
 
 from markupsafe import Markup
 
@@ -43,11 +47,15 @@ class Pages:
         app.add_endpoint('/inviting/<step>', 'back_inviting', self.back_inviting, methods=['GET', 'POST'])
         app.add_endpoint('/inviting', 'back_inviting_handler', self.back_inviting_handler)
         app.add_endpoint('/inviting/end/end', 'back_inviting_end_setting', self.back_inviting_end_setting)
+        app.add_endpoint('/newnote', 'back_post_creating', self.back_post_creating, methods=['GET', 'POST'])
+        app.add_endpoint('/editnote/<int:note_id>', 'back_post_editing', self.back_post_editing,
+                         methods=['GET', 'POST'])
+        app.add_endpoint('/deletenote/<int:note_id>', 'back_post_deleting', self.back_post_deleting)
 
     @staticmethod
     def admin_forbidden(func):
         def wrapper(*args, **kwargs):
-            if current_user.is_authenticated and current_user.role == 'admin':
+            if current_user.role == 'admin':
                 return redirect('/')
             return func(*args, **kwargs)
         return wrapper
@@ -55,7 +63,7 @@ class Pages:
     @staticmethod
     def non_admin_forbidden(func):
         def wrapper(*args, **kwargs):
-            if current_user.is_authenticated and current_user.role != 'admin':
+            if current_user.role != 'admin':
                 return redirect('/')
             return func(*args, **kwargs)
         return wrapper
@@ -63,9 +71,195 @@ class Pages:
     @staticmethod
     def back_index():
         server_data = request.cookies.get("server_data", '')
-        resp = make_response(render_template('index.html', **generate_data_for_base(user_id=server_data)))
+        db_sess = db_session.create_session()
+        notes = db_sess.query(Note).order_by(Note.made_on.desc()).all()
+        arr = []
+        for note in notes:
+            classes = json.load(open(note.path_show_config, mode='rb'))
+            if (current_user.is_authenticated and [current_user.class_number, current_user.profile_10_11] in classes or
+                    len(classes) == 12 or current_user.role == 'admin'):
+                edited_on = note.edit_on
+                if edited_on:
+                    edited_on = edited_on.strftime('%H:%M, %d.%m.%Y')
+                made_on = note.made_on.strftime('%H:%M, %d.%m.%Y')
+                arr.append(
+                    [note.id, note.title, markdown.markdown(note.text), made_on,
+                     edited_on, f'{note.author.name} {note.author.surname}']
+                )
+        db_sess.close()
+        resp = make_response(render_template('index.html', notes=arr,
+                                             **generate_data_for_base(user_id=server_data)))
         resp.set_cookie("server_data", server_data, max_age=0)
         return resp
+
+    @staticmethod
+    @login_required
+    @non_admin_forbidden
+    def back_post_creating():
+        form = NotesForm.get_form()
+        if form.validate_on_submit():
+            classes_chosen = []
+            for class_ in form.classes_ids:
+                ex_ = form.__getattribute__(f"class_{class_}")
+                if ex_.data:
+                    classes_chosen.append(f"class_{class_}")
+            if len(classes_chosen) == 0:
+                form.for_everyone.errors.append('Необходимо выбрать хотя бы один класс.')
+            else:
+                arr = []
+                profiles = json.load(open("py_scripts/consts/profiles.json", mode='rb'))
+                for class_ in classes_chosen:
+                    s = class_.split('_')
+                    if len(s) == 2:
+                        arr.append([int(s[1]), 'Общий'])
+                    else:
+                        arr.append([int(s[1]), profiles[int(s[2])]])
+                db_sess = db_session.create_session()
+                note = Note(
+                    author_id=current_user.id,
+                    title=form.title.data,
+                    text=form.text.data
+                )
+                notif = Notification(
+                    user_id=current_user.id,
+                    type='system',
+                    text='Пост успешно опубликован!'
+                )
+                notif.set_str_date()
+                db_sess.add(note)
+                db_sess.add(notif)
+                db_sess.commit()
+                note_info = [note.id, note.title]
+                json.dump(arr, open(f'admin_data/notes_config/note_{note_info[0]}.json', mode='w'))
+                note.path_show_config = f'admin_data/notes_config/note_{note_info[0]}.json'
+                db_sess.commit()
+                db_sess.close()
+
+                for_users_emails = []
+                for_users_ids = []
+
+                db_sess = db_session.create_session()
+                users = db_sess.query(User).all()
+                for user in users:
+                    if [user.class_number, user.profile_10_11] in arr:
+                        for_users_ids.append(user.id)
+                        for_users_emails.append(user.email)
+
+                if form.site_notification.data:
+                    for user in for_users_ids:
+                        notif = Notification(
+                            user_id=user,
+                            link=f'/#note-{note_info[0]}',
+                            text=f'Новая публикация от приемной комиссии: <b>"{note_info[1]}"</b>'
+                        )
+                        notif.set_str_date()
+                        db_sess.add(notif)
+
+                    notif = Notification(
+                        user_id=current_user.id,
+                        type='system',
+                        text=f'Рассылка на сайте произведена успешно!'
+                    )
+                    notif.set_str_date()
+                    db_sess.add(notif)
+                    db_sess.commit()
+
+                if form.email_notification.data:
+                    mailing_posts(for_users_emails, note_info)
+                    notif = Notification(
+                        user_id=current_user.id,
+                        type='system',
+                        text=f'Рассылка на электронную почту произведена успешно!'
+                    )
+                    notif.set_str_date()
+                    db_sess.add(notif)
+                    db_sess.commit()
+
+                db_sess.close()
+                return redirect('/')
+        return render_template('note_creating_edtiting.html', form=form,
+                               **generate_data_for_base('/newnote', 'Создание публикации'))
+
+    @staticmethod
+    @login_required
+    @non_admin_forbidden
+    def back_post_editing(note_id):
+        db_sess = db_session.create_session()
+        note = db_sess.query(Note).get(note_id)
+        if not note:
+            db_sess.close()
+            abort(404)
+
+        form = NotesForm.get_form()
+        if form.validate_on_submit():
+            classes_chosen = []
+            for class_ in form.classes_ids:
+                ex_ = form.__getattribute__(f"class_{class_}")
+                if ex_.data:
+                    classes_chosen.append(f"class_{class_}")
+            if len(classes_chosen) == 0:
+                form.for_everyone.errors.append('Необходимо выбрать хотя бы один класс.')
+            else:
+                arr = []
+                profiles = json.load(open("py_scripts/consts/profiles.json", mode='rb'))
+                for class_ in classes_chosen:
+                    s = class_.split('_')
+                    if len(s) == 2:
+                        arr.append([int(s[1]), 'Общий'])
+                    else:
+                        arr.append([int(s[1]), profiles[int(s[2])]])
+                note.title = form.title.data
+                note.text = form.text.data
+                note.edit_on = datetime.datetime.now()
+                db_sess.commit()
+                json.dump(arr, open(note.path_show_config, mode='w'))
+                db_sess.close()
+                return redirect('/')
+
+        form.title.data = note.title
+        form.text.data = note.text
+
+        classes_chosen = json.load(open(note.path_show_config, mode='rb'))
+        db_sess.close()
+        profiles = json.load(open("py_scripts/consts/profiles.json", mode='rb'))
+        arr = []
+        for class_ in classes_chosen:
+            if class_[1] not in profiles:
+                arr.append(f'class_{class_[0]}')
+            else:
+                ind = profiles.index(class_[1])
+                arr.append(f'class_{class_[0]}_{ind}')
+        for class_ in form.classes_ids:
+            ex_ = form.__getattribute__(f"class_{class_}")
+            ex_.data = True
+            form.__setattr__(f"class_{class_}", ex_)
+
+        return render_template('note_creating_edtiting.html', form=form,
+                               **generate_data_for_base('/edtinote', 'Редактирование публикации'))
+
+    @staticmethod
+    @login_required
+    @non_admin_forbidden
+    def back_post_deleting(note_id):
+        db_sess = db_session.create_session()
+        note = db_sess.query(Note).get(note_id)
+        if not note:
+            db_sess.close()
+            abort(404)
+
+        if os.path.exists(note.path_show_config):
+            os.remove(note.path_show_config)
+        db_sess.delete(note)
+        db_sess.commit()
+        notif = Notification(
+            user_id=current_user.id,
+            type='system',
+            text='Запись успешно удалена.'
+        )
+        notif.set_str_date()
+        db_sess.commit()
+        db_sess.close()
+        return redirect('/')
 
     @staticmethod
     @login_required
@@ -185,7 +379,7 @@ class Pages:
                     return redirect('/exams')
 
             return render_template('exam_creating.html', **generate_data_for_base('/exams/create',
-                                                                          'Создание нового вступительного испытания'),
+                                                                          'Создание вступительного испытания'),
                                    form=form)
         if exam_id == 'statuses':
             form = ExamStatusesForm()

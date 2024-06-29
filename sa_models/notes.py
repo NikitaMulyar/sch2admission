@@ -12,11 +12,11 @@ class Note(SqlAlchemyBase):
     author_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'))
     made_on = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     edit_on = sqlalchemy.Column(sqlalchemy.DateTime, nullable=True)
-    is_important = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
-    # Просто пометка какая-то будет
+    title = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    path_show_config = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     text = sqlalchemy.Column(sqlalchemy.Text, nullable=True)
 
     author = relationship("User", back_populates="notes")
 
     def __repr__(self):
-        return f'<Invite> {self.id} {self.exam_id} {self.user_id}'
+        return f'<Note> {self.id} {self.author_id} {self.text}'

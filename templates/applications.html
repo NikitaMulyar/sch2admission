@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2 class="h2-style"><b>Заявки на участие в конкурсе</b></h2><br>
+<h1 class="h1-style"><b>{{ title }}</b></h1><br>
     <div id="application-cards">
     {% if not user_list %}
-        <p class="p-style">Заявок нет.</p>
+        <p style="text-align: center; color: #343434;">Заявок нет.</p>
     {% else %}
         {% for user in user_list %}
             <div class="card" style="width: 80%; margin-bottom: 10px;">
