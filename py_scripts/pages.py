@@ -1,4 +1,4 @@
-from flask import render_template, request, make_response, redirect
+from flask import render_template, request, make_response, redirect, jsonify
 from flask_login import current_user, login_required
 import json
 from py_scripts.funcs_back import generate_data_for_base
@@ -23,6 +23,8 @@ class Pages:
         app.add_endpoint('/exams', 'back_exams', self.back_exams)
         app.add_endpoint('/participants', 'table_of_users', self.table_of_users, methods=['GET', 'POST'])
         app.add_endpoint('/exams/<exam_id>', 'back_exam_info', self.back_exam_info, methods=['GET', 'POST'])
+        app.add_endpoint('/users/<user_id>', 'user_info_for_admin', self.user_info_for_admin)
+        app.add_endpoint('/update', 'update_result', self.update_result, methods=["POST"])
 
     @staticmethod
     def admin_forbidden(func):
@@ -169,7 +171,7 @@ class Pages:
 
         kwargs["users"] = []
         users = db_sess.query(User).all()
-        kwargs["options_1"] = {i + 1: el for i, el in enumerate(statuses)}
+        # kwargs["options_1"] = {i + 1: el for i, el in enumerate(statuses)}
         kwargs["options_2"] = {i + 1: el for i, el in enumerate(range(6, 12))}
         kwargs["grades"] = [i for i in range(6, 12)]
         for el in users:
@@ -187,14 +189,74 @@ class Pages:
                 exams = db_sess.query(Invite).filter(Invite.user_id == el.id).order_by(desc(Invite.made_on)).all()
                 for_exam = []
                 for exam in exams:
-                    for_exam.append({"ID": exam.exam_id, "Название экзамена": exam.parent_exam.title,
-                                     "Дата": exam.parent_exam.date,
-                                     "Описание экзамена": exam.parent_exam.exam_description,
-                                     "Результат": exam.result,
-                                     "Описание результата": exam.result_description})
-
+                    exam_description = exam.parent_exam.exam_description if exam.parent_exam.exam_description else "Не указано"
+                    result = exam.result if exam.result else "Результат не установлен"
+                    result_description = exam.result_description if exam.result_description else "Не указано"
+                    for_exam.append({"ID": str(exam.exam_id), "Название экзамена": exam.parent_exam.title,
+                                     "Дата": exam.parent_exam.date.strftime("%d/%m/%Y %H:%M:%S"),
+                                     "Описание экзамена": exam_description,
+                                     "Результат": result,
+                                     "Описание результата": result_description})
                 kwargs["users"].append([f"{el.surname} {el.name} {el.third_name}", el.email, el.class_number,
-                                        statuses[el.status], for_modal, for_exam])
+                                        statuses[el.status], for_modal, for_exam, el.id])
 
         return render_template('table_of_users.html',
                                **generate_data_for_base("/participants", title="Список поступающих"), **kwargs)
+
+    @staticmethod
+    @login_required
+    @non_admin_forbidden
+    def user_info_for_admin(user_id):
+        kwargs = dict()
+        statuses = json.load(open('py_scripts/consts/contest_statuses.json', mode='rb'))
+        db_sess = db_session.create_session()
+
+        kwargs["user_info"] = []
+        user = db_sess.query(User).filter(User.id == user_id).first()
+        for_modal = [("ФИО", f"{user.surname} {user.name} {user.third_name}", "fio"),
+                     ("Эл. почта", user.email, "email")]
+        if user.class_number >= 10:
+            for_modal.append(("Класс поступления", f"{user.class_number}, {user.profile_10_11} профиль", "grade"))
+        else:
+            for_modal.append(("Класс поступления", user.class_number))
+        for_modal.extend(
+            [("Дата рождения", user.birth_date, "birthday"), ("Статус участия", statuses[user.status], "status"),
+             ("Школа", user.school, "school"),
+             ("Контакты родителя",
+              f"{user.parent_surname} {user.parent_name} {user.parent_third_name}, {user.parent_phone_number}",
+              "parent")])
+        exams = db_sess.query(Invite).filter(Invite.user_id == user.id).order_by(desc(Invite.made_on)).all()
+        for_exam = []
+        for exam in exams:
+            exam_description = exam.parent_exam.exam_description if exam.parent_exam.exam_description else "Не указано"
+            result = exam.result if exam.result else "Результат не установлен"
+            result_description = exam.result_description if exam.result_description else "Не указано"
+            for_exam.append({"ID": str(exam.exam_id), "Название экзамена": exam.parent_exam.title,
+                             "Дата": exam.parent_exam.date.strftime("%d/%m/%Y %H:%M:%S"),
+                             "Описание экзамена": exam_description,
+                             "Результат": result,
+                             "Описание результата": result_description})
+        kwargs["user_info"] = ([for_modal, for_exam])
+
+        return render_template('cabinet_for_admin.html',
+                               **generate_data_for_base("/users/<user_id>", title="Личный кабинет поступающего"),
+                               **kwargs)
+
+    @staticmethod
+    @login_required
+    @non_admin_forbidden
+    def update_result():
+        try:
+            if request.method == 'POST':
+                value = request.form['value']
+                edit_id = request.form['id']
+                db_sess = db_session.create_session()
+                exam = db_sess.query(Exam).filter(Exam.id == edit_id).first()
+                exam.result_description = value
+                db_sess.commit()
+                db_sess.close()
+
+                success = 1
+                return jsonify(success)
+        except Exception as e:
+            print(e)

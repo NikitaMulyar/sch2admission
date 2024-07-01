@@ -26,7 +26,8 @@
         {% for grade in grades %}
         <div class="form-check form-check-inline">
             {% if grade in checked_grades %}
-            <input class="form-check-input" name="grade" type="checkbox" id="inlineCheckbox1" value="{{ grade }}" checked>
+            <input class="form-check-input" name="grade" type="checkbox" id="inlineCheckbox1" value="{{ grade }}"
+                   checked>
             {% else %}
             <input class="form-check-input" name="grade" type="checkbox" id="inlineCheckbox1" value="{{ grade }}">
             {% endif %}
@@ -127,21 +128,39 @@
                     </tbody>
                 </table>
 
+                {% if users[i][5] %}
                 <h2 class="h2-style"><b>Написанные экзамены</b></h2><br>
                 <table class="table table-bordered">
+                    <thead class="thead-light">
+                    <tr>
+                        {% for row in users[i][5][0].keys() %}
+                        <th scope="col">{{ row }}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
                     <tbody>
                     {% for row in users[i][5] %}
                     <tr>
-                        <th scope="row" style="width: 30%">{{ row[0] }}</th>
-                        <td>{{ row[1] }}</td>
+                        {% for key, val in row.items() %}
+                        {% if key == "ID" or key == "Название экзамена" %}
+                        <td><a href="/exams/{{ val }}">{{ val }}</a></td>
+                        {% else %}
+                        <td>{{ val }}</td>
+                        {% endif %}
+                        {% endfor %}
                     </tr>
                     {% endfor %}
                     </tbody>
                 </table>
+                {% else %}
+                <h2 class="h2-style"><b>На экзамены не был приглашен</b></h2><br>
+                {% endif %}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-dismiss="modal">Закрыть</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal">Открыть в отдельной вкладке</button>
+                <a href="/users/{{ users[i][6] }}" target="_blank" class="btn btn-primary btn-lg" tabindex="-1"
+                   role="button">Открыть в отдельной вкладке</a>
+                <!--                <button type="button" class="btn btn-primary" data-dismiss="modal">Открыть в отдельной вкладке</button>-->
             </div>
         </div>
     </div>
