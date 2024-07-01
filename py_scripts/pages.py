@@ -151,7 +151,40 @@ class Pages:
             return render_template('exam_creating.html', **generate_data_for_base('/exams/create',
                                                                                   'Создание нового вступительного испытания'),
                                    form=form)
-        # МАТВЕЙ, ТУТ ТВОИ ОБРАБОТЧИКИ
+        else:
+            if request.method == "POST":
+                select = request.form.get('result_select')
+                db_sess = db_session.create_session()
+                invite = db_sess.query(Invite).filter(
+                    and_(Invite.exam_id == exam_id, Invite.user_id == int(select.split("_")[1]))).first()
+                invite.result = select.split("_")[0]
+                invite.edited_on = datetime.datetime.now()
+                db_sess.commit()
+                db_sess.close()
+            db_sess = db_session.create_session()
+            kwargs = dict()
+            kwargs["exam_id"] = exam_id
+            exam = db_sess.query(Exam).filter(Exam.id == exam_id).first()
+            exam_description = exam.exam_description if exam.exam_description else "Не указано"
+            kwargs["exam_info"] = {"ID": exam.id, "Название": exam.title, "Дата": exam.date,
+                                   "Описание экзамена": exam_description}
+            if exam.for_class < 10:
+                kwargs["exam_info"]["Класс"] = exam.for_class
+            else:
+                f"{exam.for_class}, {exam.profile_10_11}"
+
+            participants = db_sess.query(Invite).filter(Invite.exam_id == exam_id).all()
+            kwargs["users"] = list()
+            kwargs["res_opt"] = json.load(open('py_scripts/consts/results.json', mode='rb'))
+            for el in participants:
+                result = kwargs["res_opt"][el.result] if el.result else "Результат не установлен"
+                result_description = el.result_description if el.result_description else "Не указано"
+                kwargs["users"].append(
+                    {"ID": el.user_id,
+                     "ФИО": f"{el.parent_user.surname} {el.parent_user.name} {el.parent_user.third_name}",
+                     "Почта": el.parent_user.email, "Результат": result, "Описание результата": result_description})
+            return render_template("exam_table.html",
+                                   **generate_data_for_base('/exams/<exam_id>', 'Информация об экзамене'), **kwargs)
 
     @staticmethod
     @login_required
@@ -249,8 +282,6 @@ class Pages:
                              "Результат": result,
                              "Описание результата": result_description})
         kwargs["user_info"] = [for_modal, for_exam, user.id]
-
-
         return render_template('cabinet_for_admin.html',
                                **generate_data_for_base("/users/<user_id>", title="Личный кабинет поступающего"),
                                **kwargs)
@@ -264,6 +295,7 @@ class Pages:
                 value = request.form['value']
                 edit_id = request.form['id']
                 user_id = request.form['user_id']
+                print(value, edit_id, user_id)
                 db_sess = db_session.create_session()
                 invite = db_sess.query(Invite).filter(
                     and_(Invite.exam_id == edit_id, Invite.user_id == user_id)).first()
