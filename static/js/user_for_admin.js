@@ -1,7 +1,7 @@
 $(document).ready(function(){
 
  // Show Input element
- $('.edit').click(function(){
+ $('.edit').dblclick(function(){
   $('.txtedit').hide();
   $(this).next('.txtedit').show().focus();
   $(this).hide();
@@ -15,6 +15,7 @@ $(document).ready(function(){
   var split_id = id.split("_");
 //  var field_name = split_id[0];
   var edit_id = split_id[2];
+  var user_id = split_id[3];
   var value = $(this).val();
 
   // Hide Input element
@@ -27,7 +28,7 @@ if(confirm("Сохранить изменения?")) {
   $.ajax({
    url: '/update',
    type: 'post',
-   data: { value:value, id:edit_id },
+   data: { value:value, id:edit_id, user_id:user_id },
    success:function(response){
       if(response == 1){
          console.log('Save successfully');

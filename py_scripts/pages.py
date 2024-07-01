@@ -1,3 +1,5 @@
+import datetime
+
 from flask import render_template, request, make_response, redirect, jsonify
 from flask_login import current_user, login_required
 import json
@@ -8,7 +10,7 @@ from sa_models.notifications import Notification
 from py_scripts.forms import ExamCreateForm
 from sa_models.users import User
 from sa_models.invites import Invite
-from sqlalchemy import desc
+from sqlalchemy import desc, and_
 
 from markupsafe import Markup
 
@@ -23,7 +25,7 @@ class Pages:
         app.add_endpoint('/exams', 'back_exams', self.back_exams)
         app.add_endpoint('/participants', 'table_of_users', self.table_of_users, methods=['GET', 'POST'])
         app.add_endpoint('/exams/<exam_id>', 'back_exam_info', self.back_exam_info, methods=['GET', 'POST'])
-        app.add_endpoint('/users/<user_id>', 'user_info_for_admin', self.user_info_for_admin)
+        app.add_endpoint('/users/<user_id>', 'user_info_for_admin', self.user_info_for_admin, methods=['GET', 'POST'])
         app.add_endpoint('/update', 'update_result', self.update_result, methods=["POST"])
 
     @staticmethod
@@ -162,12 +164,12 @@ class Pages:
         statuses = json.load(open('py_scripts/consts/contest_statuses.json', mode='rb'))
         db_sess = db_session.create_session()
 
-        import datetime
-        inv1 = Invite(user_id=2, exam_id=1, made_on=datetime.datetime(year=2024, day=29, month=6))
-        db_sess.add(inv1)
-        inv1 = Invite(user_id=2, exam_id=1, made_on=datetime.datetime(year=2024, day=30, month=6))
-        db_sess.add(inv1)
-        db_sess.commit()
+        # import datetime
+        # inv1 = Invite(user_id=2, exam_id=1, made_on=datetime.datetime(year=2024, day=29, month=6))
+        # db_sess.add(inv1)
+        # inv1 = Invite(user_id=2, exam_id=1, made_on=datetime.datetime(year=2024, day=30, month=6))
+        # db_sess.add(inv1)
+        # db_sess.commit()
 
         kwargs["users"] = []
         users = db_sess.query(User).all()
@@ -207,6 +209,15 @@ class Pages:
     @login_required
     @non_admin_forbidden
     def user_info_for_admin(user_id):
+        if request.method == "POST":
+            select = request.form.get('result_select')
+            db_sess = db_session.create_session()
+            invite = db_sess.query(Invite).filter(
+                and_(Invite.exam_id == int(select.split("_")[1]), Invite.user_id == user_id)).first()
+            invite.result = select.split("_")[0]
+            invite.edited_on = datetime.datetime.now()
+            db_sess.commit()
+            db_sess.close()
         kwargs = dict()
         statuses = json.load(open('py_scripts/consts/contest_statuses.json', mode='rb'))
         db_sess = db_session.create_session()
@@ -227,16 +238,18 @@ class Pages:
               "parent")])
         exams = db_sess.query(Invite).filter(Invite.user_id == user.id).order_by(desc(Invite.made_on)).all()
         for_exam = []
+        kwargs["res_opt"] = json.load(open('py_scripts/consts/results.json', mode='rb'))
         for exam in exams:
             exam_description = exam.parent_exam.exam_description if exam.parent_exam.exam_description else "Не указано"
-            result = exam.result if exam.result else "Результат не установлен"
+            result = kwargs["res_opt"][exam.result]
             result_description = exam.result_description if exam.result_description else "Не указано"
             for_exam.append({"ID": str(exam.exam_id), "Название экзамена": exam.parent_exam.title,
                              "Дата": exam.parent_exam.date.strftime("%d/%m/%Y %H:%M:%S"),
                              "Описание экзамена": exam_description,
                              "Результат": result,
                              "Описание результата": result_description})
-        kwargs["user_info"] = ([for_modal, for_exam])
+        kwargs["user_info"] = [for_modal, for_exam, user.id]
+
 
         return render_template('cabinet_for_admin.html',
                                **generate_data_for_base("/users/<user_id>", title="Личный кабинет поступающего"),
@@ -250,9 +263,12 @@ class Pages:
             if request.method == 'POST':
                 value = request.form['value']
                 edit_id = request.form['id']
+                user_id = request.form['user_id']
                 db_sess = db_session.create_session()
-                exam = db_sess.query(Exam).filter(Exam.id == edit_id).first()
-                exam.result_description = value
+                invite = db_sess.query(Invite).filter(
+                    and_(Invite.exam_id == edit_id, Invite.user_id == user_id)).first()
+                invite.result_description = value
+                invite.edited_on = datetime.datetime.now()
                 db_sess.commit()
                 db_sess.close()
 

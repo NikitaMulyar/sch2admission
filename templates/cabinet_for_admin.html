@@ -53,15 +53,6 @@
             {% if loop.index == 5 %}
             {% if row[1] == "Участвуете в конкурсе" %}
             <td class="status"><span class="take_part">{{ row[1] }}</span>
-                <!--                <form method="post">-->
-                <!--                <select class="form-select" aria-label="Default select example">-->
-                <!--                    <option selected>Open this select menu</option>-->
-                <!--                    <option value="1">One</option>-->
-                <!--                    <option value="2">Two</option>-->
-                <!--                    <option value="3">Three</option>-->
-                <!--                </select>-->
-                <!--                    <button type="submit">Submit</button>-->
-                <!--                </form>-->
             </td>
             {% elif row[1]== "Выбыли из конкурса" %}
             <td class="status"><span class="dont_take_part">{{ row[1] }}</span></td>
@@ -91,7 +82,11 @@
         <thead class="thead-light">
         <tr>
             {% for row in user_info[1][0].keys() %}
+            {% if row == "Описание результата" %}
+            <th scope="col">{{ row }} <br>(Нажмите дважды для изменения)</th>
+            {% else %}
             <th scope="col">{{ row }}</th>
+            {% endif %}
             {% endfor %}
         </tr>
         </thead>
@@ -101,10 +96,30 @@
             {% for key, val in row.items() %}
             {% if key == "ID" or key == "Название экзамена" %}
             <td><a href="/exams/{{ row['ID'] }}">{{ val }}</a></td>
+            {% elif key == "Результат" %}
+            <td>
+                <form method="post">
+                    <div class="form-group">
+                        <select name="result_select" class="form-select">
+                            {% for val_opt, text_opt in res_opt.items() %}
+                            {% if text_opt == row["Результат"] %}
+                            <option value="{{ val_opt }}_{{ row['ID'] }}" selected>{{ text_opt }}</option>
+                            {% else %}
+                            <option value="{{ val_opt }}_{{ row['ID'] }}">{{ text_opt }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2">Изменить</button>
+                </form>
+            </td>
             {% elif key == "Описание результата" %}
             <td>
                 <div class='edit'> {{ row['Описание результата'] }}</div>
-                <input type='text' class='txtedit' value="{{ row['Описание результата'] }}" id="result_description_{{ row['ID'] }}">
+                <textarea class='form-control txtedit' id="result_description_{{ row['ID'] }}_{{ user_info[2] }}"
+                          rows="3">{{ row['Описание результата'] }}</textarea>
+                <!--                <input type='text' class='txtedit' value="{{ row['Описание результата'] }}"-->
+                <!--                       id="result_description_{{ row['ID'] }}_{{ user_info[2] }}">-->
             </td>
             {% else %}
             <td>{{ val }}</td>
