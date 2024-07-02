@@ -1,13 +1,13 @@
+import ssl
+
 from flask import Flask, send_from_directory
 from flask_login import LoginManager
 
+from py_scripts.auth_class import AuthClass
 from py_scripts.flask_wrapper import FlaskAppWrapper
 from py_scripts.pages import Pages
-from py_scripts.auth_class import AuthClass
 from sa_models import db_session
 from sa_models.users import User
-import ssl
-
 
 ssl._create_default_https_context = ssl._create_unverified_context
 

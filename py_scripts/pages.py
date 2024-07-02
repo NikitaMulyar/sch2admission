@@ -1,10 +1,15 @@
 import datetime
+import json
 import os
 
 import markdown
 from flask import render_template, request, make_response, redirect, abort, jsonify
 from flask_login import current_user, login_required
-import json
+from sqlalchemy import desc, and_
+
+from py_scripts.forms import ExamCreateForm
+from py_scripts.forms import ExamStatusesForm
+from py_scripts.forms import InvitesForm, NotesForm
 from py_scripts.funcs_back import generate_data_for_base, status_changed_notif, mailing_invites, INVITES_PROCESS
 from py_scripts.funcs_back import mailing_posts
 from sa_models import db_session
@@ -12,15 +17,6 @@ from sa_models.exams import Exam
 from sa_models.invites import Invite
 from sa_models.notes import Note
 from sa_models.notifications import Notification
-from py_scripts.forms import ExamCreateForm, ExamStatusesForm
-from py_scripts.forms import InvitesForm, NotesForm
-from py_scripts.forms import ExamCreateForm
-from sa_models.users import User
-from sa_models.invites import Invite
-from sqlalchemy import desc, and_
-
-from markupsafe import Markup
-
 from sa_models.users import User
 
 
@@ -348,7 +344,7 @@ class Pages:
             arr = [exam.id, exam.title, exam.profile_10_11, exam.date.strftime("%H:%M, %d.%m.%Y")]
             exams_list[exam.for_class].append(arr)
         return render_template('exams.html', **generate_data_for_base('/exams',
-                                                                        'Вступительные испытания'),
+                                                                      'Вступительные испытания'),
                                exams_list=exams_list)
 
     @staticmethod
@@ -389,7 +385,7 @@ class Pages:
                     return redirect('/exams')
 
             return render_template('exam_creating.html', **generate_data_for_base('/exams/create',
-                                                                          'Создание вступительного испытания'),
+                                                                                  'Создание вступительного испытания'),
                                    form=form)
         if exam_id == 'statuses':
             form = ExamStatusesForm()
@@ -587,7 +583,8 @@ class Pages:
             data = [
                 ("Эл. почта", user.email),
                 ("Дата рождения", user.birth_date.strftime('%d.%m.%Y')),
-                ("Поступает в", f"{user.class_number} {user.profile_10_11.lower() if user.class_number >= 10 else ''} класс"),
+                ("Поступает в",
+                 f"{user.class_number} {user.profile_10_11.lower() if user.class_number >= 10 else ''} класс"),
                 ("Школа", user.school),
                 ("Родитель", f"{user.parent_surname} {user.parent_name} {user.parent_third_name}"),
                 ("Телефон", user.parent_phone_number),
@@ -656,14 +653,14 @@ class Pages:
             path_ = f'admin_data/invites_config/invite_{current_user.id}.json'
             if not os.path.exists(path_):
                 info = dict()
-                info["CLASS"] = -1                 # part 1
-                info["PROFILE"] = ''               # part 1
-                info["EXAM_ID_NEW"] = -1           # part 2
-                info["EXAM_IDS_NEED"] = []         # part 2
-                info["LIMIT"] = -1                 # auto 1
-                info["PRIORITY"] = -1              # auto 1
-                info["TIMES_WRITTEN"] = []         # auto 1
-                info["STUDENTS_IDS"] = []          # auto 2 / manual
+                info["CLASS"] = -1  # part 1
+                info["PROFILE"] = ''  # part 1
+                info["EXAM_ID_NEW"] = -1  # part 2
+                info["EXAM_IDS_NEED"] = []  # part 2
+                info["LIMIT"] = -1  # auto 1
+                info["PRIORITY"] = -1  # auto 1
+                info["TIMES_WRITTEN"] = []  # auto 1
+                info["STUDENTS_IDS"] = []  # auto 2 / manual
                 json.dump(info, open(path_, mode='w'))
             info = json.load(open(path_, mode='rb'))
 

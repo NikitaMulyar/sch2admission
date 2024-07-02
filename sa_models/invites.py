@@ -13,7 +13,7 @@ class Invite(SqlAlchemyBase):
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
     made_on = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     edited_on = sqlalchemy.Column(sqlalchemy.DateTime, nullable=True)
-    result = sqlalchemy.Column(sqlalchemy.String, nullable=True, default=0)
+    result = sqlalchemy.Column(sqlalchemy.String, nullable=True, default=7)
     result_description = sqlalchemy.Column(sqlalchemy.Text, nullable=True)
 
     parent_user = relationship("User", back_populates="invites")

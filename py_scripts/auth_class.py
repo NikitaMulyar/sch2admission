@@ -1,20 +1,18 @@
 import datetime
+import json
 
 from flask import render_template, request, redirect, abort, make_response
 from flask_login import login_user, current_user, login_required, logout_user
 
-from sa_models import db_session
-from sa_models.notifications import Notification
-from sa_models.users import User
-from sa_models.recovers import Recover
-
-import json
 from py_scripts.forms import (RegisterFormClasses6To7, RegisterFormClasses8To11, LoginForm, RecoverForm,
                               RegisterFormAdmins)
 from py_scripts.funcs_back import (register_user, generate_data_for_base, generate_and_send_recover_link,
                                    reset_password,
                                    register_admin)
-
+from sa_models import db_session
+from sa_models.notifications import Notification
+from sa_models.recovers import Recover
+from sa_models.users import User
 
 FOLDER = ''
 
@@ -34,6 +32,7 @@ class AuthClass:
             if current_user.is_authenticated:
                 return redirect('/')
             return func(*args, **kwargs)
+
         return wrapper
 
     @staticmethod

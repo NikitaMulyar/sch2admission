@@ -1,12 +1,12 @@
+import datetime
+import json
+
+import phonenumbers
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileAllowed, FileRequired
 from wtforms import EmailField, PasswordField, SubmitField, BooleanField, StringField, FileField, \
     DateField, TextAreaField, SelectField, TelField, DateTimeLocalField, IntegerField
-from wtforms.validators import Optional, InputRequired, ValidationError, DataRequired
-from flask_wtf.file import FileAllowed, FileRequired
-import phonenumbers
-
-import json
-import datetime
+from wtforms.validators import Optional, InputRequired, ValidationError
 
 from sa_models import db_session
 from sa_models.exams import Exam
@@ -152,6 +152,7 @@ class InvitesForm:
                                   validators=[InputRequired('Обязательное поле')],
                                   description='Нажмите на поле, чтобы выбрать профиль.')
             forward = SubmitField('Далее')
+
         return Part1()
 
     @staticmethod
@@ -223,6 +224,7 @@ class InvitesForm:
             written_1_times = BooleanField('Писал 1 раз')
             written_2_times = BooleanField('Писал 2 раза')
             forward = SubmitField('Далее')
+
         return PartAuto1()
 
     @staticmethod

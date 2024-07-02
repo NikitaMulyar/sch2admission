@@ -1,25 +1,24 @@
+import asyncio
+import json
+import os
+import random
+import smtplib
+from email.mime.text import MIMEText
+from multiprocessing import Process, Manager
 from time import sleep
 
 import aiosmtplib
-import smtplib
-import asyncio
-from email.mime.text import MIMEText
 import markdown
-
 import phonenumbers
 from flask import request
 from flask_login import current_user
+from werkzeug.utils import secure_filename
+
 from py_scripts.forms import RegisterFormClasses8To11, RegisterFormAdmins
-from sa_models.exams import Exam
-from sa_models.users import User
+from sa_models import db_session
 from sa_models.notifications import Notification
 from sa_models.recovers import Recover
-from sa_models import db_session
-import os
-import random
-import json
-from werkzeug.utils import secure_filename
-from multiprocessing import Process, Manager
+from sa_models.users import User
 
 INVITES_PROCESS = {}
 
