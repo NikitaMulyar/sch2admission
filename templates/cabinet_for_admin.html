@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="h2-style"><b>{{ title }}</b></h2><br>
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+      integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script>
+<link rel="stylesheet" href="/static/css/style2.css"/>
+<link rel="stylesheet" href="/static/css/cabinet_for_admin.css"/>
+<script src="/static/js/user_for_admin.js"></script>
+
+<div class="container">
+    <table class="table table-bordered">
+        <tbody>
+        {% for row in user_info[0] %}
+        <tr>
+            <td scope="row" style="width: 30%">{{ row[0] }}</td>
+            {% if loop.index == 5 %}
+            {% if row[1] == "Участвуете в конкурсе" %}
+            <td class="status"><span class="take_part">{{ row[1] }}</span>
+            </td>
+            {% elif row[1]== "Выбыли из конкурса" %}
+            <td class="status"><span class="dont_take_part">{{ row[1] }}</span></td>
+            {% elif row[1] == "Приняты в Лицей" %}
+            <td class="status"><span class="in_lyceum">{{ row[1] }}</span></td>
+            {% elif row[1] == "Занесены в резерв" %}
+            <td class="status"><span class="reserve">{{ row[1] }}</span></td>
+            {% elif row[1] == "Заявка отклонена" %}
+            <td class="status"><span class="cancel">{{ row[1] }}</span></td>
+            {% else %}
+            <td class="status"><span class="waiting">{{ row[1] }}</span></td>
+            {% endif %}
+            {% else %}
+            <td>
+<!--                <div class='edit'> {{row[1]}}</div>-->
+<!--                <input type='text' class='txtedit' value='{{row[1]}}' id='{{row[2]}}_{{row[0]}}'>-->
+                {{ row[1] }}
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% if user_info[1] %}
+    <h2 class="h2-style"><b>Написанные экзамены</b></h2><br>
+    <table class="table table-bordered">
+        <thead class="thead-light">
+        <tr>
+            {% for row in user_info[1][0].keys() %}
+            {% if row == "Описание результата" %}
+            <th scope="col">{{ row }} <br>(Нажмите дважды для изменения)</th>
+            {% else %}
+            <th scope="col">{{ row }}</th>
+            {% endif %}
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in user_info[1] %}
+        <tr>
+            {% for key, val in row.items() %}
+            {% if key == "ID" or key == "Название экзамена" %}
+            <td><a href="/exams/{{ row['ID'] }}">{{ val }}</a></td>
+            {% elif key == "Результат" %}
+            <td>
+                <form method="post">
+                    <div class="form-group">
+                        <select name="result_select" class="form-select">
+                            {% for val_opt, text_opt in res_opt.items() %}
+                            {% if text_opt == row["Результат"] %}
+                            <option value="{{ val_opt }}_{{ row['ID'] }}" selected>{{ text_opt }}</option>
+                            {% else %}
+                            <option value="{{ val_opt }}_{{ row['ID'] }}">{{ text_opt }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2">Изменить</button>
+                </form>
+            </td>
+            {% elif key == "Описание результата" %}
+            <td>
+                <div class='edit'> {{ row['Описание результата'] }}</div>
+                <textarea class='form-control txtedit' id="result_description_{{ row['ID'] }}_{{ user_info[2] }}"
+                          rows="3">{{ row['Описание результата'] }}</textarea>
+                <!--                <input type='text' class='txtedit' value="{{ row['Описание результата'] }}"-->
+                <!--                       id="result_description_{{ row['ID'] }}_{{ user_info[2] }}">-->
+            </td>
+            {% else %}
+            <td>{{ val }}</td>
+            {% endif %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <h2 class="h2-style"><b>На экзамены не был приглашен</b></h2><br>
+    {% endif %}
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.0/bootstrap-table.js'></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.css"/>
+<script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/users_table.js"></script>
+<script src="/static/js/user_for_admin.js"></script>
+<link rel="stylesheet" href="/static/css/style2.css"/>
+<link rel="stylesheet" href="/static/css/cabinet_for_admin.css"/>
+<div class="container">
+    <h2 class="h2-style"><b>Страница экзамена</b></h2><br>
+    <table class="table table-bordered">
+        <tbody>
+        {% for key, val in exam_info.items() %}
+        <tr>
+            <th scope="row" style="width: 30%">{{ key }}</th>
+            <td>{{ val }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% if users %}
+    <h2 class="h2-style"><b>Приглашенные участники</b></h2><br>
+    <div class="form-group pull-left">
+        <form>
+            <input type="text" name="focus" required class="search-box search form-control" placeholder="Поиск"/>
+            <button class="close-icon" type="reset"></button>
+        </form>
+    </div>
+    <span class="counter pull-right"></span>
+    <table id="example" class="table results table-hover"
+           data-escape="false"
+           data-toggle="table"
+           data-filter-control="true">
+        <thead class="thead-light">
+        <tr>
+            <th scope="col" data-field="name" data-sortable="true">ФИО поступающего</th>
+            <th scope="col" data-field="mail" data-sortable="true">Почта</th>
+            <th scope="col" data-field="result" data-sortable="true">Результат</th>
+            <th scope="col" data-field="result_description">Описание результата</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="table-warning no-result">
+            <td colspan="5">Нет результатов</td>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>
+                <div class="media align-items-center" style="display: flex;align-items: flex-start;">
+                    <img alt="Image placeholder" src="/static/img/logo.png" style="width: 40px; height: 40px;">
+                    <span class="fs-6">{{ user["ФИО"] }}</span>
+                </div>
+            </td>
+            <td>{{ user["Почта"] }}</td>
+            <td>
+                <form method="post">
+                    <div class="form-group">
+                        <select name="result_select" class="form-select">
+                            {% for val_opt, text_opt in res_opt.items() %}
+                            {% if text_opt == user["Результат"] %}
+                            <option value="{{ val_opt }}_{{ user['ID'] }}" selected>{{ text_opt }}</option>
+                            {% else %}
+                            <option value="{{ val_opt }}_{{ user['ID'] }}">{{ text_opt }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2">Изменить</button>
+                </form>
+            </td>
+            <td>
+                <div class='edit'> {{ user['Описание результата'] }}</div>
+                <textarea class='form-control txtedit' id="result_description_{{ exam_id }}_{{ user['ID'] }}"
+                          rows="3">{{ user['Описание результата'] }}</textarea>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <h2 class="h2-style"><b>На экзамены никто не был приглашен</b></h2><br>
+    {% endif %}
+</div>
+
+{% endblock %}
