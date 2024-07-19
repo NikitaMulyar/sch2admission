@@ -491,7 +491,7 @@ class Pages:
                                      "Результат": result,
                                      "Описание результата": result_description})
                 kwargs["users"].append([f"{el.surname} {el.name} {el.third_name}", el.email, el.class_number,
-                                        statuses[el.status], for_modal, for_exam, el.id])
+                                        statuses[el.status], for_modal, for_exam, el.id, el.photo_path])
 
         return render_template('table_of_users.html',
                                **generate_data_for_base("/participants", title="Список поступающих"), **kwargs)

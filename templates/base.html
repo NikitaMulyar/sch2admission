@@ -79,6 +79,14 @@
             </li>
         {% endfor %}
     {% else %}
+        <li class="nav-item">
+        {% if "/login" == current %}
+            <a href="/login" class="btn btn-primary active position-relative" aria-current="page" id="nav-buttons">Войти
+                в личный кабинет</a>
+        {% else %}
+            <a href="/login" class="btn btn-primary position-relative" id="nav-buttons">Войти в личный кабинет</a>
+        {% endif %}
+        </li>
         {% if exams_on["6-7"] %}
             <li class="nav-item">
             {% if "/register/6-7" == current %}
@@ -103,14 +111,6 @@
             {% endif %}
             </li>
         {% endif %}
-        <li class="nav-item">
-        {% if "/login" == current %}
-            <a href="/login" class="btn btn-primary active position-relative" aria-current="page" id="nav-buttons">Войти
-                в личный кабинет</a>
-        {% else %}
-            <a href="/login" class="btn btn-primary position-relative" id="nav-buttons">Войти в личный кабинет</a>
-        {% endif %}
-        </li>
     {% endif %}
 </nav>
 <br>

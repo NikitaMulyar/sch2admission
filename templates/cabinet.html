@@ -5,6 +5,8 @@
     <table class="table table-bordered">
         <tbody>
         {% for row in data %}
+        <a href="/{{ user[0] }}" target="_blank"><img src="/{{ user[0] }}" class="card-img-top" alt="/{{ user[0] }}" style="width: 250px; display:block; margin:auto;"></a>
+
         <tr>
             <th scope="row" style="width: 30%">{{ row[0] }}</th>
             {% if loop.index == 1 %}
