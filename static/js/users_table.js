@@ -17,8 +17,17 @@ $(document).ready(function() {
     $(this).attr('visible','true');
   });
 
-  var jobCount = $('.results tbody tr[visible="true"]').length;
-    $('.counter').text(jobCount + ' элементов');
+//  var jobCount = $('.results tbody tr[visible="true"]').length;
+//    $('.counter').text(jobCount + ' элементов');
+
+   if ($('.results tbody tr[visible="true"]').length === $('.results tbody tr').length) {
+    // Если все видимы, уменьшаем jobCount на единицу
+    var jobCount = $('.results tbody tr[visible="true"]').length - 1;
+  } else {
+    // В противном случае, получаем обычный jobCount
+    var jobCount = $('.results tbody tr[visible="true"]').length;
+  }
+  $('.counter').text(jobCount + ' элементов');
 
   if(jobCount == '0') {$('.no-result').show();}
     else {$('.no-result').hide();}
