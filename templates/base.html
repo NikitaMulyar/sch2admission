@@ -37,27 +37,44 @@
                 </li></div>
 
                 {% if current_user.is_authenticated and current_user.role != 'admin' %}
-                    {% for page in pages %}
-                        <div><li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ page }}">pages[page]</a>
-                        </li></div>
-                    {% endfor %}
+                    <div><li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Действия
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% for page in pages %}
+                                <li>
+                                    <a href="{{ page }}" class="dropdown-item">
+                                        {{ pages[page] }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li></div>
                 {% elif current_user.is_authenticated and current_user.role == 'admin' %}
-                    {% for page in admin_pages %}
-                        <div><li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ page }}">admin_pages[page]
-                                {% if page == '/applications' and application_number != 0 %}
-                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                        `{% if application_number > 999 %}
-                                            999+
-                                        {% else %}
-                                            {{ application_number }}
-                                        {% endif %}`
-                                    </span>
-                                {% endif %}
-                            </a>
-                        </li></div>
-                    {% endfor %}
+                    <div><li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Действия
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% for page in admin_pages %}
+                                <li>
+                                    <a href="{{ page }}" class="dropdown-item">
+                                        {{ admin_pages[page] }}
+                                    </a>
+                                </li>
+{#                                    {% if page == '/applications' and application_number != 0 %}#}
+{#                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">#}
+{#                                            `{% if application_number > 999 %}#}
+{#                                                999+#}
+{#                                            {% else %}#}
+{#                                                {{ application_number }}#}
+{#                                            {% endif %}`#}
+{#                                        </span>#}
+{#                                    {% endif %}#}
+                            {% endfor %}
+                        </ul>
+                    </li></div>
                 {% else %}
                     <div><li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">

@@ -2,7 +2,7 @@
 
 {% block content %}
 <h1 class="h1-style"><b>{{ title }}</b></h1><br>
-    <h3 style="text-align: center;">Добро пожаловать на сайт для поступающих в Лицей "Вторая Школа"!</h3>
+    <h3>Добро пожаловать на сайт для поступающих в Лицей «Вторая Школа»!</h3>
     {% if current_user.role == "admin" %}
         <a href="/newnote" class="btn btn-success" id="buttons-style">Создать запись</a>
     {% endif %}
@@ -16,7 +16,7 @@
             {% endif %}
             <div class="note" id="note-{{ note[0] }}">
                 <div class="note-content">
-                    <h4><b>{{ note[1] }}</b></h4>
+                    <h4 class="note-title"><b>{{ note[1] }}</b></h4>
                     <small class="text-body-secondary">Создано: {{ note[3] }} {{ if_edited }}</small><br>
                     <div class="p-style">
                         {{ note[2]|safe }}

@@ -190,7 +190,7 @@ def register_admin(form: RegisterFormAdmins):
     return uid
 
 
-def generate_data_for_base(title='Главная', user_id=''):
+def generate_data_for_base(title='Записи приёмной комиссии', user_id=''):
     reg_stats = json.load(open('py_scripts/consts/registration_status.json', mode='rb'))
     d = dict()
     d['exams_on'] = reg_stats

@@ -46,7 +46,7 @@
     background: #eae7dc;
     font-size: 1.2em;
     margin: auto;
-    width: 90%;
+    width: 80%;
     color: #374785;
 }
 
@@ -118,6 +118,10 @@ tr.spaceUnder > td {
     border: 2px dotted #464866;
     margin: auto;
     margin-bottom: 36px;
+}
+
+.note-title {
+    color: rgba(0, 48, 205, 0.62);
 }
 
 .note-content {

@@ -51,6 +51,7 @@ class Pages:
         app.add_endpoint('/editnote/<int:note_id>', 'back_post_editing', self.back_post_editing,
                          methods=['GET', 'POST'])
         app.add_endpoint('/deletenote/<int:note_id>', 'back_post_deleting', self.back_post_deleting)
+        app.add_endpoint('/about', 'back_about', self.back_about)
 
     @staticmethod
     def admin_forbidden(func):
@@ -89,6 +90,31 @@ class Pages:
         db_sess.close()
         resp = make_response(render_template('index.html', notes=arr,
                                              **generate_data_for_base(user_id=server_data)))
+        resp.set_cookie("server_data", server_data, max_age=0)
+        return resp
+
+    @staticmethod
+    def back_about():
+        server_data = request.cookies.get("server_data", '')
+        db_sess = db_session.create_session()
+        notes = db_sess.query(Note).order_by(Note.made_on.desc()).all()
+        arr = []
+        for note in notes:
+            classes = json.load(open(note.path_show_config, mode='rb'))
+            if (current_user.is_authenticated and [current_user.class_number, current_user.profile_10_11] in classes or
+                    len(classes) == 12 or current_user.is_authenticated and current_user.role == 'admin'):
+                edited_on = note.edit_on
+                if edited_on:
+                    edited_on = edited_on.strftime('%H:%M, %d.%m.%Y')
+                made_on = note.made_on.strftime('%H:%M, %d.%m.%Y')
+                arr.append(
+                    [note.id, note.title, markdown.markdown(note.text), made_on,
+                     edited_on, f'{note.author.name} {note.author.surname}']
+                )
+        db_sess.close()
+        resp = make_response(render_template('about.html', notes=arr,
+                                             **generate_data_for_base(title='О поступлении',
+                                                                      user_id=server_data)))
         resp.set_cookie("server_data", server_data, max_age=0)
         return resp
 
