@@ -64,7 +64,7 @@ class AuthClass:
                 db_sess.close()
                 return redirect('/')
         resp = make_response(render_template('login.html', form=form,
-                                             **generate_data_for_base('/login', 'Авторизация',
+                                             **generate_data_for_base('Авторизация',
                                                                       user_id=server_data)))
         resp.set_cookie("server_data", server_data, max_age=0)
         return resp
@@ -114,7 +114,7 @@ class AuthClass:
                         return resp
                     form.email.errors.append('Не получилось отправить письмо с паролем на указанную почту.')
             return render_template('admin_register.html', form=form,
-                                   **generate_data_for_base(f'/register/{classes}', title))
+                                   **generate_data_for_base(title))
 
         title = 'Регистрация на вступительные испытания в 6, 7 классы'
         form = RegisterFormClasses6To7()
@@ -137,7 +137,7 @@ class AuthClass:
                     return resp
                 form.email.errors.append('Не получилось отправить письмо с паролем на указанную почту.')
         return render_template('register.html', form=form,
-                               **generate_data_for_base(f'/register/{classes}', title))
+                               **generate_data_for_base(title))
 
     @staticmethod
     @login_forbidden
@@ -166,7 +166,7 @@ class AuthClass:
                             'Не получилось отправить письмо с ссылкой для восстановления пароля на указанную почту.')
                     db_sess.close()
             resp = make_response(render_template('recover.html', form=form,
-                                                 **generate_data_for_base(f'/recover/recover', 'Восстановление пароля',
+                                                 **generate_data_for_base('Восстановление пароля',
                                                                           user_id=server_data)))
             resp.set_cookie("server_data", server_data, max_age=0)
             return resp

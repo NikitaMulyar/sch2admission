@@ -16,7 +16,7 @@
     <form action="" method="post" id="myForm">
         {{ form.hidden_tag() }}
         {% if form.errors %}
-            <div class="alert alert-danger d-flex align-items-center" role="alert" style="margin-top: 5px !important;">
+            <div class="alert alert-danger d-flex align-items-center" role="alert">
                 <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
                     <use xlink:href="#exclamation-triangle-fill"/>
                 </svg>
@@ -33,12 +33,11 @@
             <a id="checkBox2-text">ОТКРЫТА</a></p>
         <p>{{ form.submit(type="submit", class="btn btn-success", **{"id": "myBtn"}) }}</p>
         <div class="collapse" id="collapseExample">
-            <div class="card card-body"
-                 style="display: flex !important;  flex-direction: row  !important;  justify-content: flex-start  !important;">
+            <div class="card card-body">
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
-                <div style="padding-left: 10px !important;">
+                <div>
                     Одну секунду,<br>проверяем данные...
                 </div>
             </div>

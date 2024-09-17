@@ -40,56 +40,50 @@
     src: url(/static/fonts/MuseoSansCyrl-900Italic.ttf);
 }
 
-#base-style{
+#base-style {
     font-family: MyWebFont, serif;
     padding-top: 20px;
     background: #eae7dc;
-    font-size: 18px;
+    font-size: 1.2em;
     margin: auto;
     width: 90%;
     color: #374785;
 }
 
-#footer-style{
+#footer-style {
     background: #d8c3a5 !important;
     border-top: 2px solid #374785 !important;
     text-align: center;
-    font-size: 14px !important;
+    font-size: 1rem !important;
     padding-top: 10px;
     padding-bottom: 1px;
     margin-top: 40%;
 }
 
-.h1-style{
-    color: #464866;
+.h1-style {
+    color: rgba(0, 48, 205, 0.62) !important;
     text-align: center;
     margin: auto;
     border-bottom: 2px solid #d8c3a5;
     max-width: 70%;
 }
 
-.p-style{
+.p-style {
     color: #343434;
     padding-left: 10px;
 }
 
-#nav-buttons{
-    margin: 5px;
-    font-size: 16px !important;
-    width: 300px;
-}
-
-.description_form{
-    font-size: 14px !important;
+.description_form {
+    font-size: 1rem !important;
     margin-top: -18px;
 }
 
-tr.spaceUnder>td {
-  padding-bottom: 20px;
+tr.spaceUnder > td {
+    padding-bottom: 20px;
 }
 
 #myBtn {
-    font-size: 18px !important;
+    font-size: 1.2rem !important;
 }
 
 .checkbox {
@@ -112,7 +106,7 @@ tr.spaceUnder>td {
 }
 
 #buttons-style {
-    font-size: 18px !important;
+    font-size: 1.2rem !important;
 }
 
 #progress-bar-1 {
@@ -128,4 +122,36 @@ tr.spaceUnder>td {
 
 .note-content {
     padding: 10px;
+}
+
+#title-main {
+    text-align: center;
+    margin: auto;
+    margin-bottom: 10px;
+}
+
+#nav-menu {
+    font-size: 1em !important;
+}
+
+#main-nav-bar {
+    display: flex;
+    flex-direction: row;
+}
+
+.nav-link, .dropdown-item {
+    color: #343434 !important;
+}
+
+.nav-link:hover, .dropdown-item:hover {
+    color: rgba(0, 48, 205, 0.62) !important;
+}
+
+@media screen and (max-width: 1000px) {
+    #navbarSupportedContent {
+        flex-direction: column;
+    }
+    #navbarSupportedContent > ul {
+        flex-direction: column;
+    }
 }

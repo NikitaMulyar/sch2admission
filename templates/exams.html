@@ -2,9 +2,9 @@
 
 {% block content %}
 <h1 class="h1-style"><b>{{ title }}</b></h1><br>
-    <a href="/exams/statuses" class="btn btn-danger" style="margin-bottom: 10px; font-size: 18px !important;">Открыть/закрыть регистрацию на экзамены</a>
+    <a href="/exams/statuses" class="btn btn-danger">Открыть/закрыть регистрацию на экзамены</a>
     <br>
-    <a href="/exams/create" class="btn btn-success" style="margin-bottom: 10px; font-size: 18px !important;">Создать новый экзамен</a>
+    <a href="/exams/create" class="btn btn-success">Создать новый экзамен</a>
     {% set classes = [6, 7, 8, 9, 10, 11] %}
     <div class="accordion" id="accordionPanelsStayOpenExample">
         {% for cl in classes %}
@@ -12,7 +12,7 @@
                 <h2 class="accordion-header" id="panelsStayOpen-heading{{ cl }}">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                             data-bs-target="#panelsStayOpen-collapse{{ cl }}" aria-expanded="false"
-                            aria-controls="panelsStayOpen-collapse{{ cl }}"  style="font-size: 18px !important;">
+                            aria-controls="panelsStayOpen-collapse{{ cl }}">
                         Вступительные испытания в {{ cl }} класс
                     </button>
                 </h2>

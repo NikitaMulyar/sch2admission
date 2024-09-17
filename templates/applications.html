@@ -4,14 +4,14 @@
 <h1 class="h1-style"><b>{{ title }}</b></h1><br>
     <div id="application-cards">
     {% if not user_list %}
-        <p style="text-align: center; color: #343434;">Заявок нет.</p>
+        <p>Заявок нет.</p>
     {% else %}
         {% for user in user_list %}
-            <div class="card" style="width: 80%; margin-bottom: 10px;">
-                <a href="/{{ user[0] }}" target="_blank"><img src="/{{ user[0] }}" class="card-img-top" alt="/{{ user[0] }}" style="width: 250px; display:block; margin:auto;"></a>
+            <div class="card">
+                <a href="/{{ user[0] }}" target="_blank"><img src="/{{ user[0] }}" class="card-img-top" alt="/{{ user[0] }}"></a>
                 <div class="card-body">
                     <h4 class="card-title">{{ user[1] }}</h4>
-                    <table class="table table-bordered" style="word-wrap: break-word; table-layout: fixed;">
+                    <table class="table table-bordered">
                         <tbody>
                         {% for row in user[2] %}
                             <tr>
@@ -22,8 +22,8 @@
                         </tbody>
                     </table>
                     <p class="card-text">Дата регистрации: {{ user[3] }}</p>
-                    <a href="application/{{ user[4] }}/approve" class="btn btn-success" style="font-size: 18px !important;">Одобрить</a>
-                    <a href="application/{{ user[4] }}/reject" class="btn btn-danger" style="font-size: 18px !important;">Отклонить</a>
+                    <a href="application/{{ user[4] }}/approve" class="btn btn-success">Одобрить</a>
+                    <a href="application/{{ user[4] }}/reject" class="btn btn-danger">Отклонить</a>
                 </div>
             </div>
         {% endfor %}

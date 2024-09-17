@@ -16,7 +16,7 @@
     <form action="" method="post" id="myForm">
         {{ form.hidden_tag() }}
         {% if form.errors %}
-            <div class="alert alert-danger d-flex align-items-center" role="alert" style="margin-top: 5px !important;">
+            <div class="alert alert-danger d-flex align-items-center" role="alert">
                 <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
                     <use xlink:href="#exclamation-triangle-fill"/>
                 </svg>
@@ -32,7 +32,7 @@
         <div class="description_form">{{ form.email.description }}</div>
         {{ form.email(class="form-control", type="email", **{"placeholder": "example@example.com"}) }}
         {% for error in form.email.errors %}
-            <div class="alert alert-danger d-flex align-items-center" role="alert" style="margin-top: 5px !important;">
+            <div class="alert alert-danger d-flex align-items-center" role="alert">
                 <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
                     <use xlink:href="#exclamation-triangle-fill"/>
                 </svg>
@@ -47,7 +47,7 @@
         <div class="description_form">{{ form.password.description }}</div>
         {{ form.password(class="form-control", type="password") }}
         {% for error in form.password.errors %}
-            <div class="alert alert-danger d-flex align-items-center" role="alert" style="margin-top: 5px !important;">
+            <div class="alert alert-danger d-flex align-items-center" role="alert">
                 <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
                     <use xlink:href="#exclamation-triangle-fill"/>
                 </svg>
@@ -60,12 +60,11 @@
         <p>{{ form.remember_me(class_="checkbox2") }} {{ form.remember_me.label }}</p>
         <p>{{ form.submit(type="submit", class="btn btn-success", **{"id": "myBtn"}) }}</p>
         <div class="collapse" id="collapseExample">
-            <div class="card card-body"
-                 style="display: flex !important;  flex-direction: row  !important;  justify-content: flex-start  !important;">
+            <div class="card card-body">
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
-                <div style="padding-left: 10px !important;">
+                <div>
                     Одну секунду,<br>проверяем данные...
                 </div>
             </div>

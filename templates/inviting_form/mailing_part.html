@@ -5,14 +5,14 @@
     <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
     {% set width_val = (data[0]|length / data[1] * 100)|round %}
     <div id="progress-bar-1">
-        <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="{{ data[0]|length }}" aria-valuemin="0" aria-valuemax="{{ data[1] }}" style="height: 22px;">
-          <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: {{ width_val }}%; font-size: 18px;">Прогресс рассылки: {{ width_val }}%</div>
+        <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="{{ data[0]|length }}" aria-valuemin="0" aria-valuemax="{{ data[1] }}">
+          <div class="progress-bar progress-bar-striped progress-bar-animated">Прогресс рассылки: {{ width_val }}%</div>
         </div>
     </div>
     <br>
     <h5>Письма уже отправлены следующим людям:</h5>
         {% for el in data[0] %}
-            <p class="p-style" style="margin-bottom: 10px;"> {{ loop.index }}. {{ el[0] }} <a href="/users/{{ el[1] }}" class="btn btn-primary" target="_blank">Подробнее</a></p>
+            <p class="p-style"> {{ loop.index }}. {{ el[0] }} <a href="/users/{{ el[1] }}" class="btn btn-primary" target="_blank">Подробнее</a></p>
         {% endfor %}
     <script src="/static/js/inviting_part1.js"></script>
 {% endblock %}

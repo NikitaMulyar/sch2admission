@@ -190,14 +190,13 @@ def register_admin(form: RegisterFormAdmins):
     return uid
 
 
-def generate_data_for_base(current='/', title='Главная', user_id=''):
+def generate_data_for_base(title='Главная', user_id=''):
     reg_stats = json.load(open('py_scripts/consts/registration_status.json', mode='rb'))
     d = dict()
     d['exams_on'] = reg_stats
     # d['pic_url'] = url_for('static', filename='img/logo.png')
     d['pages'] = json.load(open('py_scripts/consts/pages.json', mode='rb'))
     d['admin_pages'] = json.load(open('py_scripts/consts/admin_pages.json', mode='rb'))
-    d['current'] = current
     d['title'] = title
     db_sess = db_session.create_session()
     if current_user.is_authenticated:

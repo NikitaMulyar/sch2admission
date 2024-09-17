@@ -4,10 +4,10 @@
 <h1 class="h1-style"><b>{{ title }}</b></h1><br>
     <h3 style="text-align: center;">Добро пожаловать на сайт для поступающих в Лицей "Вторая Школа"!</h3>
     {% if current_user.role == "admin" %}
-        <a href="/newnote" class="btn btn-success" style="margin-top: 10px; margin-bottom: 10px;" id="buttons-style">Создать запись</a>
+        <a href="/newnote" class="btn btn-success" id="buttons-style">Создать запись</a>
     {% endif %}
     {% if not notes %}
-    <p style="text-align: center; color: #343434;">Здесь будут объявления от приемной комисии.</p>
+        <p>Здесь будут объявления от приемной комисии.</p>
     {% else %}
         {% for note in notes %}
             {% set if_edited = "" %}
@@ -16,15 +16,14 @@
             {% endif %}
             <div class="note" id="note-{{ note[0] }}">
                 <div class="note-content">
-                    <h4 style="margin-bottom: -5px; color: #464866;"><b>{{ note[1] }}</b></h4>
+                    <h4><b>{{ note[1] }}</b></h4>
                     <small class="text-body-secondary">Создано: {{ note[3] }} {{ if_edited }}</small><br>
-                    <div class="p-style" style="margin-top: 5px;">
+                    <div class="p-style">
                         {{ note[2]|safe }}
                     </div>
-                    <p class="p-style" style="margin-bottom: -5px;">Автор: {{ note[5] }}</p>
+                    <p class="p-style">Автор: {{ note[5] }}</p>
                     {% if current_user.role == "admin" %}
-                        <a href="/editnote/{{ note[0] }}" class="btn btn-warning"
-                           style="margin-top: 10px; margin-bottom: 10px;" id="buttons-style">Редактировать</a>
+                        <a href="/editnote/{{ note[0] }}" class="btn btn-warning" id="buttons-style">Редактировать</a>
                         <button type="button" class="btn btn-danger" data-bs-toggle="modal"
                                 data-bs-target="#exampleModal{{ note[0] }}" id="buttons-style">
                             Удалить

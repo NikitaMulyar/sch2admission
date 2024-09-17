@@ -77,7 +77,7 @@ class Pages:
         for note in notes:
             classes = json.load(open(note.path_show_config, mode='rb'))
             if (current_user.is_authenticated and [current_user.class_number, current_user.profile_10_11] in classes or
-                    len(classes) == 12 or current_user.role == 'admin'):
+                    len(classes) == 12 or current_user.is_authenticated and current_user.role == 'admin'):
                 edited_on = note.edit_on
                 if edited_on:
                     edited_on = edited_on.strftime('%H:%M, %d.%m.%Y')
@@ -178,7 +178,7 @@ class Pages:
                 db_sess.close()
                 return redirect('/')
         return render_template('note_creating_edtiting.html', form=form,
-                               **generate_data_for_base('/newnote', 'Создание публикации'))
+                               **generate_data_for_base('Создание публикации'))
 
     @staticmethod
     @login_required
@@ -235,7 +235,7 @@ class Pages:
             form.__setattr__(f"class_{class_}", ex_)
 
         return render_template('note_creating_edtiting.html', form=form,
-                               **generate_data_for_base('/edtinote', 'Редактирование публикации'))
+                               **generate_data_for_base('Редактирование публикации'))
 
     @staticmethod
     @login_required
@@ -284,7 +284,7 @@ class Pages:
                 ("Эл. почта", current_user.email),
                 ("ФИО", f"{current_user.surname} {current_user.name} {current_user.third_name}"),
             ]
-        return render_template('cabinet.html', **generate_data_for_base('/lk', 'Личный кабинет'),
+        return render_template('cabinet.html', **generate_data_for_base('Личный кабинет'),
                                data=data)
 
     @staticmethod
@@ -298,8 +298,7 @@ class Pages:
         for inv in invites:
             arr.append([inv.parent_exam.title, inv.parent_exam.date.strftime('%H:%M, %d.%m.%Y'),
                         inv.parent_exam.exam_description])
-        return render_template('invites.html', **generate_data_for_base('/invites',
-                                                                        'Приглашения на вступительные испытания'),
+        return render_template('invites.html', **generate_data_for_base('Приглашения на вступительные испытания'),
                                invites=arr)
 
     @staticmethod
@@ -318,14 +317,12 @@ class Pages:
             else:
                 arr.append([inv.parent_exam.title, inv.parent_exam.date.strftime('%H:%M, %d.%m.%Y'),
                             '-', '-', inv.result])
-        return render_template('results.html', **generate_data_for_base('/results',
-                                                                        'Результаты вступительных испытаний'),
+        return render_template('results.html', **generate_data_for_base('Результаты вступительных испытаний'),
                                invites=arr)
 
     @staticmethod
     def back_contacts():
-        return render_template('contacts.html', **generate_data_for_base('/contacts',
-                                                                         'Контакты'))
+        return render_template('contacts.html', **generate_data_for_base('Контакты'))
 
     @staticmethod
     @login_required
@@ -337,8 +334,7 @@ class Pages:
         for exam in exams:
             arr = [exam.id, exam.title, exam.profile_10_11, exam.date.strftime("%H:%M, %d.%m.%Y")]
             exams_list[exam.for_class].append(arr)
-        return render_template('exams.html', **generate_data_for_base('/exams',
-                                                                        'Вступительные испытания'),
+        return render_template('exams.html', **generate_data_for_base('Вступительные испытания'),
                                exams_list=exams_list)
 
     @staticmethod
@@ -378,8 +374,7 @@ class Pages:
                     db_sess.close()
                     return redirect('/exams')
 
-            return render_template('exam_creating.html', **generate_data_for_base('/exams/create',
-                                                                          'Создание вступительного испытания'),
+            return render_template('exam_creating.html', **generate_data_for_base('Создание вступительного испытания'),
                                    form=form)
         if exam_id == 'statuses':
             form = ExamStatusesForm()
@@ -400,8 +395,7 @@ class Pages:
                 db_sess.close()
                 return redirect('/exams')
             return render_template('manage_exams_statuses.html',
-                                   **generate_data_for_base('/exams/statuses',
-                                                            'Настройка регистрации на вступительные испытания'),
+                                   **generate_data_for_base('Настройка регистрации на вступительные испытания'),
                                    form=form)
         # МАТВЕЙ, ТУТ ТВОИ ОБРАБОТЧИКИ
 
@@ -432,8 +426,7 @@ class Pages:
             arr.extend([user.reg_date.strftime('%H:%M, %d.%m.%Y'), user.id])
             user_list.append(arr)
         db_sess.close()
-        return render_template('applications.html', **generate_data_for_base('/applications',
-                                                                             'Заявки на участие в конкурсе'),
+        return render_template('applications.html', **generate_data_for_base('Заявки на участие в конкурсе'),
                                user_list=user_list)
 
     @staticmethod
@@ -509,7 +502,7 @@ class Pages:
                     form.profile.data = info["PROFILE"]
 
                 return render_template('inviting_form/part1.html',
-                                       **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                       **generate_data_for_base('Создание приглашений на '
                                                                              'вступительные испытания'),
                                        form=form)
             elif step == '2':
@@ -525,7 +518,7 @@ class Pages:
                         form.__getattribute__(f'exam_need_{ex[0]}').data = True
 
                 return render_template('inviting_form/part2.html',
-                                       **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                       **generate_data_for_base('Создание приглашений на '
                                                                              'вступительные испытания'),
                                        form=form)
             elif step == 'a1':
@@ -551,7 +544,7 @@ class Pages:
                         form.written_2_times.data = True
 
                 return render_template('inviting_form/partA1.html',
-                                       **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                       **generate_data_for_base('Создание приглашений на '
                                                                              'вступительные испытания'),
                                        form=form)
             elif step == 'a2':
@@ -569,7 +562,7 @@ class Pages:
 
                 form = InvitesForm.get_part_a2(**info)
                 return render_template('inviting_form/partA2.html',
-                                       **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                       **generate_data_for_base('Создание приглашений на '
                                                                              'вступительные испытания'),
                                        form=form)
             elif step == 'm':
@@ -583,7 +576,7 @@ class Pages:
 
                 form = InvitesForm.get_part_m(**info)
                 return render_template('inviting_form/partM.html',
-                                       **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                       **generate_data_for_base('Создание приглашений на '
                                                                              'вступительные испытания'),
                                        form=form)
         elif request.method == "POST":
@@ -604,7 +597,7 @@ class Pages:
 
                     return redirect('/inviting/2')
                 return render_template('inviting_form/part1.html',
-                                       **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                       **generate_data_for_base('Создание приглашений на '
                                                                              'вступительные испытания'),
                                        form=form)
             elif step == '2':
@@ -623,7 +616,7 @@ class Pages:
                         return redirect('/inviting/a1')
                     return redirect('/inviting/m')
                 return render_template('inviting_form/part2.html',
-                                       **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                       **generate_data_for_base('Создание приглашений на '
                                                                              'вступительные испытания'),
                                        form=form)
             elif step == 'a1':
@@ -643,14 +636,14 @@ class Pages:
                     if len(info["TIMES_WRITTEN"]) == 0:
                         form.written_2_times.errors.append('Необходимо выбрать хотя бы один пункт в кол-ве попыток')
                         return render_template('inviting_form/partA1.html',
-                                               **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                               **generate_data_for_base('Создание приглашений на '
                                                                                      'вступительные испытания'),
                                                form=form)
                     json.dump(info, open(path_, mode='w'))
 
                     return redirect('/inviting/a2')
                 return render_template('inviting_form/partA1.html',
-                                       **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                       **generate_data_for_base('Создание приглашений на '
                                                                              'вступительные испытания'),
                                        form=form)
             elif step == 'a2':
@@ -666,7 +659,7 @@ class Pages:
 
                     return redirect('/inviting/end/end')
                 return render_template('inviting_form/partA2.html',
-                                       **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                       **generate_data_for_base('Создание приглашений на '
                                                                              'вступительные испытания'),
                                        form=form)
             elif step == 'm':
@@ -682,7 +675,7 @@ class Pages:
 
                     return redirect('/inviting/end/end')
                 return render_template('inviting_form/partM.html',
-                                       **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                       **generate_data_for_base('Создание приглашений на '
                                                                              'вступительные испытания'),
                                        form=form)
 
@@ -714,7 +707,7 @@ class Pages:
                 INVITES_PROCESS[current_user.id][2] = INVITES_PROCESS[current_user.id][2] - 1
 
             return render_template('inviting_form/mailing_part.html',
-                                   **generate_data_for_base('/inviting', 'Создание приглашений на '
+                                   **generate_data_for_base('Создание приглашений на '
                                                                          'вступительные испытания'),
                                    data=data)
 
@@ -746,6 +739,6 @@ class Pages:
 
         data = [[], len(users_)]
         return render_template('inviting_form/mailing_part.html',
-                               **generate_data_for_base('/inviting', 'Создание приглашений на '
+                               **generate_data_for_base('Создание приглашений на '
                                                                      'вступительные испытания'),
                                data=data)

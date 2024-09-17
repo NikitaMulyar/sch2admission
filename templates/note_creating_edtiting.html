@@ -17,7 +17,7 @@
     <form action="" method="post" enctype="multipart/form-data" id="myForm">
         {{ form.hidden_tag() }}
         {% if form.errors %}
-            <div class="alert alert-danger d-flex align-items-center" role="alert" style="margin-top: 5px !important;">
+            <div class="alert alert-danger d-flex align-items-center" role="alert">
                 <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
                     <use xlink:href="#exclamation-triangle-fill"/>
                 </svg>
@@ -33,7 +33,7 @@
         <div class="description_form">{{ form.title.description }}</div>
         {{ form.title(class="form-control") }}
         {% for error in form.title.errors %}
-            <div class="alert alert-danger d-flex align-items-center" role="alert" style="margin-top: 5px !important;">
+            <div class="alert alert-danger d-flex align-items-center" role="alert">
                 <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
                     <use xlink:href="#exclamation-triangle-fill"/>
                 </svg>
@@ -48,7 +48,7 @@
         <div class="description_form">{{ form.text.description|safe }}</div>
         {{ form.text(class="form-control", rows="5") }}
         {% for error in form.text.errors %}
-            <div class="alert alert-danger d-flex align-items-center" role="alert" style="margin-top: 5px !important;">
+            <div class="alert alert-danger d-flex align-items-center" role="alert">
                 <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
                     <use xlink:href="#exclamation-triangle-fill"/>
                 </svg>
@@ -68,11 +68,11 @@
         {% endif %}
         <p>
             Выберите классы, для которых предназначена публикация
-            <p class="p-style" style="margin-bottom: 10px;">
+            <p class="p-style">
                 {{ form.for_everyone(class_="checkbox", id="all-classes") }} {{ form.for_everyone.label }}
             </p>
             {% for class_ in form.classes_ids %}
-                <p class="p-style" style="margin-bottom: 10px;">
+                <p class="p-style">
                     {{ form.__getattribute__("class_{}".format(class_))(class_="checkbox class-field") }} {{ form.__getattribute__("class_{}".format(class_)).label }}
                 </p>
             {% endfor %}
@@ -80,8 +80,7 @@
 
         {{ form.submit(type="submit", class="btn btn-success", **{"id": "myBtn"}) }}
         <div class="collapse" id="collapseExample">
-            <div class="card card-body"
-                 style="display: flex !important;  flex-direction: row  !important;  justify-content: flex-start  !important;">
+            <div class="card card-body">
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
