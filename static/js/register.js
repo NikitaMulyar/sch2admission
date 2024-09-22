@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const bsCollapse = new bootstrap.Collapse(collapseContent, {toggle: false});
 
     form.addEventListener('submit', function(event) {
+        alert(10);
         bsCollapse.show();
         submitButton.hidden = true;
         setTimeout(function() {

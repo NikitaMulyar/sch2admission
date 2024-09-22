@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 class="h1-style"><b>{{ title }}</b></h1><br>
+<h1 class="h1-style"><b>{{ title }}</b></h1>
     <h3>Добро пожаловать на сайт для поступающих в Лицей «Вторая Школа»!</h3>
     {% if current_user.role == "admin" %}
         <a href="/newnote" class="btn btn-success" id="buttons-style">Создать запись</a>

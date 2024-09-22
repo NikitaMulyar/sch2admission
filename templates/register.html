@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1 class="h1-style"><b>{{ title }}</b></h1><br>
+    <h1 class="h1-style"><b>{{ title }}</b></h1>
     <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
     <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
         <symbol id="check-circle-fill" viewBox="0 0 16 16">
@@ -43,41 +43,64 @@
             </div>
         {% endfor %}
         </p>
-        <p>
-            {{ form.surname.label }}
-        <div class="description_form">{{ form.surname.description }}</div>
-        {{ form.surname(class="form-control") }}
-        {% for error in form.surname.errors %}
-            <div class="alert alert-danger d-flex align-items-center" role="alert">
-                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
-                    <use xlink:href="#exclamation-triangle-fill"/>
-                </svg>
-                <div>
-                    {{ error }}
+        <div class="form-row-elements">
+        <div class="block-row-3-reg">
+            <p>
+                {{ form.surname.label }}
+            <div class="description_form">{{ form.surname.description }}</div>
+            {{ form.surname(class="form-control") }}
+            {% for error in form.surname.errors %}
+                <div class="alert alert-danger d-flex align-items-center" role="alert">
+                    <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
+                        <use xlink:href="#exclamation-triangle-fill"/>
+                    </svg>
+                    <div>
+                        {{ error }}
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
-        </p>
-        <p>
-            {{ form.name.label }}
-        <div class="description_form">{{ form.name.description }}</div>
-        {{ form.name(class="form-control") }}
-        {% for error in form.name.errors %}
-            <div class="alert alert-danger d-flex align-items-center" role="alert">
-                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
-                    <use xlink:href="#exclamation-triangle-fill"/>
-                </svg>
-                <div>
-                    {{ error }}
+            {% endfor %}
+            </p>
+        </div>
+        <div class="block-row-3-reg">
+            <p>
+                {{ form.name.label }}
+            <div class="description_form">{{ form.name.description }}</div>
+            {{ form.name(class="form-control") }}
+            {% for error in form.name.errors %}
+                <div class="alert alert-danger d-flex align-items-center" role="alert">
+                    <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
+                        <use xlink:href="#exclamation-triangle-fill"/>
+                    </svg>
+                    <div>
+                        {{ error }}
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
-        </p>
+            {% endfor %}
+            </p>
+        </div>
+        <div class="block-row-3-reg">
+            <p>
+                {{ form.third_name.label }}
+            <div class="description_form">{{ form.third_name.description }}</div>
+            {{ form.third_name(class="form-control") }}
+            {% for error in form.third_name.errors %}
+                <div class="alert alert-danger d-flex align-items-center" role="alert">
+                    <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
+                        <use xlink:href="#exclamation-triangle-fill"/>
+                    </svg>
+                    <div>
+                        {{ error }}
+                    </div>
+                </div>
+            {% endfor %}
+            </p>
+        </div>
+        </div>
         <p>
-            {{ form.third_name.label }}
-        <div class="description_form">{{ form.third_name.description }}</div>
-        {{ form.third_name(class="form-control") }}
-        {% for error in form.third_name.errors %}
+            {{ form.birth_date.label }}
+        <div class="description_form">{{ form.birth_date.description }}</div>
+        {{ form.birth_date(class="form-control") }}
+        {% for error in form.birth_date.errors %}
             <div class="alert alert-danger d-flex align-items-center" role="alert">
                 <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
                     <use xlink:href="#exclamation-triangle-fill"/>
@@ -123,21 +146,6 @@
             {% endif %}
         </div>
         <p>
-            {{ form.birth_date.label }}
-        <div class="description_form">{{ form.birth_date.description }}</div>
-        {{ form.birth_date(class="form-control") }}
-        {% for error in form.birth_date.errors %}
-            <div class="alert alert-danger d-flex align-items-center" role="alert">
-                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
-                    <use xlink:href="#exclamation-triangle-fill"/>
-                </svg>
-                <div>
-                    {{ error }}
-                </div>
-            </div>
-        {% endfor %}
-        </p>
-        <p>
             {{ form.school.label }}
         <div class="description_form">{{ form.school.description }}</div>
         {{ form.school(class="form-control") }}
@@ -182,6 +190,8 @@
             </div>
         {% endfor %}
         </p>
+        <div class="form-row-elements">
+        <div class="block-row-3-reg">
         <p>
             {{ form.parent_surname.label }}
         <div class="description_form">{{ form.parent_surname.description }}</div>
@@ -197,6 +207,8 @@
             </div>
         {% endfor %}
         </p>
+        </div>
+        <div class="block-row-3-reg">
         <p>
             {{ form.parent_name.label }}
         <div class="description_form">{{ form.parent_name.description }}</div>
@@ -212,6 +224,8 @@
             </div>
         {% endfor %}
         </p>
+        </div>
+        <div class="block-row-3-reg">
         <p>
             {{ form.parent_third_name.label }}
         <div class="description_form">{{ form.parent_third_name.description }}</div>
@@ -227,6 +241,8 @@
             </div>
         {% endfor %}
         </p>
+        </div>
+        </div>
         <p>
             {{ form.parent_phone_number.label }}
         <div class="description_form">{{ form.parent_phone_number.description }}</div>

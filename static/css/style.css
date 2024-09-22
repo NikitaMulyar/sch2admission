@@ -66,6 +66,7 @@
     margin: auto;
     border-bottom: 2px solid #d8c3a5;
     max-width: 70%;
+    margin-bottom: 20px;
 }
 
 .p-style {
@@ -136,6 +137,7 @@ tr.spaceUnder > td {
 
 #nav-menu {
     font-size: 1em !important;
+    margin-bottom: 20px;
 }
 
 #main-nav-bar {
@@ -158,4 +160,28 @@ tr.spaceUnder > td {
     #navbarSupportedContent > ul {
         flex-direction: column;
     }
+}
+
+.form-control {
+    font-size: 1em !important;
+}
+
+.form-row-elements {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+/*.form-col-elements {*/
+/*    display: flex;*/
+/*    flex-direction: column !important;*/
+/*    align-content: space-evenly;*/
+/*}*/
+
+.block-row-3-reg {
+    width: 30%;
+}
+
+.block-row-2-reg {
+    width: 45%;
 }
