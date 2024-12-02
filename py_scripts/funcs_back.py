@@ -9,7 +9,7 @@ import markdown
 import phonenumbers
 from flask import request
 from flask_login import current_user
-from py_scripts.forms import RegisterFormClasses8To11, RegisterFormAdmins
+from py_scripts.forms import RegisterForm, RegisterFormAdmins
 from sa_models.exams import Exam
 from sa_models.users import User
 from sa_models.notifications import Notification
@@ -109,7 +109,7 @@ def generate_and_send_password_recover(email, name, surname, admin=False, third_
     return psw
 
 
-def register_user(request: request, form: RegisterFormClasses8To11, folder):
+def register_user(request: request, form: RegisterForm, folder):
     try:
         psw = generate_and_send_password(form.email.data, form.name.data, form.surname.data)
     except Exception:

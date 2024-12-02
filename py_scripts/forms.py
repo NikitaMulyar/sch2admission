@@ -40,16 +40,20 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Войти')
 
 
-class RegisterFormClasses6To7(FlaskForm):
+class RegisterForm(FlaskForm):
     email = EmailField('Введите адрес эл. почты', validators=[InputRequired('Обязательное поле')],
                        description='В дальнейшем он будет использоваться для связи, отправления приглашений и входа на сайт. '
                                    'После заполнения формы на него придет пароль от Вашего личного кабинета.')
     surname = StringField('Введите фамилию поступающего', validators=[InputRequired('Обязательное поле')])
     name = StringField('Введите имя поступающего', validators=[InputRequired('Обязательное поле')])
     third_name = StringField('Введите отчество поступающего', validators=[InputRequired('Обязательное поле')])
-    class_number = SelectField('Выберите класс, в который ПОСТУПАЕТ ребенок', choices=list(range(6, 8)),
+    class_number = SelectField('Выберите класс, в который ПОСТУПАЕТ ребенок', choices=[],
                                validators=[InputRequired('Обязательное поле')], coerce=int,
                                description='Нажмите на поле, чтобы выбрать класс.')
+    profile = SelectField('Выберите профиль, в который Вы хотите поступить',
+                          choices=json.load(open("py_scripts/consts/profiles.json", mode='rb')),
+                          validators=[InputRequired('Обязательное поле')],
+                          description='Нажмите на поле, чтобы выбрать профиль.')
     birth_date = DateField('Введите дату рождения поступающего',
                            validators=[InputRequired('Указана некорректная дата')])
     school = StringField('Введите номер или название школы, в которой сейчас учится поступающий',
@@ -67,16 +71,6 @@ class RegisterFormClasses6To7(FlaskForm):
     photo = FileField('Прикрепите фото поступающего', validators=[FileRequired('Обязательное поле'),
                                                                   FileAllowed(['png', 'jpg', 'jpeg', 'heic'])])
     submit = SubmitField('Продолжить')
-
-
-class RegisterFormClasses8To11(RegisterFormClasses6To7):
-    class_number = SelectField('Выберите класс, в который ПОСТУПАЕТ ребенок', choices=list(range(8, 12)),
-                               validators=[InputRequired('Обязательное поле')], coerce=int,
-                               description='Нажмите на поле, чтобы выбрать класс.')
-    profile = SelectField('Выберите профиль, в который Вы хотите поступить',
-                          choices=json.load(open("py_scripts/consts/profiles.json", mode='rb')),
-                          validators=[InputRequired('Обязательное поле')],
-                          description='Нажмите на поле, чтобы выбрать профиль.')
 
 
 class RegisterFormAdmins(FlaskForm):

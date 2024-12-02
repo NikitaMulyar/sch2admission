@@ -67,6 +67,7 @@
     border-bottom: 2px solid #d8c3a5;
     max-width: 70%;
     margin-bottom: 20px;
+    margin-top: 8rem;
 }
 
 .p-style {
@@ -130,40 +131,67 @@ tr.spaceUnder > td {
 }
 
 #title-main {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: center;
+}
+
+#site-fixed-nav {
+    position: fixed;
+    background: #eae7dc;
     text-align: center;
-    margin: auto;
-    margin-bottom: 10px;
+    width: 90%;
+    margin-left: 5%;
+    top: 0;
+    left: 0;
+    padding: 0;
+    border-bottom: 1px solid rgba(0, 48, 205, 0.62) !important;
+}
+
+#site-title {
+    font-size: 1.2rem !important;
 }
 
 #nav-menu {
-    font-size: 1em !important;
-    margin-bottom: 20px;
+    font-size: 1rem !important;
 }
 
-#main-nav-bar {
-    display: flex;
-    flex-direction: row;
+.navbar {
+    border-radius: 15px !important;
+    background: #eae7dc !important;
+    border-bottom: 1px solid rgba(0, 48, 205, 0.62) !important;
 }
+
+#offcanvasNavbar {
+    background: #eae7dc !important;
+    width: 25em;
+}
+
+/*#main-nav-bar > div {*/
+/*    border: 0.8px solid rgba(0, 48, 205, 0.62) !important;*/
+/*    border-radius: 15px !important;*/
+/*    margin-right: 10px;*/
+/*}*/
+
+/*#main-nav-bar {*/
+/*    display: flex;*/
+/*    flex-direction: row;*/
+/*}*/
 
 .nav-link, .dropdown-item {
     color: #343434 !important;
+    font-size: 1rem !important;
 }
 
 .nav-link:hover, .dropdown-item:hover {
     color: rgba(0, 48, 205, 0.62) !important;
 }
 
-@media screen and (max-width: 1000px) {
-    #navbarSupportedContent {
-        flex-direction: column;
-    }
-    #navbarSupportedContent > ul {
-        flex-direction: column;
-    }
-}
-
 .form-control {
-    font-size: 1em !important;
+    font-size: 1.2rem !important;
+    background: #eae7dc;
+    border: 1px solid rgba(0, 48, 205, 0.62) !important;
 }
 
 .form-row-elements {
@@ -172,16 +200,32 @@ tr.spaceUnder > td {
     justify-content: space-between;
 }
 
-/*.form-col-elements {*/
-/*    display: flex;*/
-/*    flex-direction: column !important;*/
-/*    align-content: space-evenly;*/
-/*}*/
-
 .block-row-3-reg {
     width: 30%;
+    display: flex;
+    flex-direction: column;
+    align-content: space-between;
+    justify-content: space-between;
+    /*padding-bottom: 0;*/
 }
 
 .block-row-2-reg {
     width: 45%;
+}
+
+.dropdown-menu, .dropdown-menu > li > a:hover {
+    background: #eae7dc !important;
+}
+
+.nav-item {
+    border-bottom: 1px solid rgba(0, 48, 205, 0.62) !important;
+}
+
+.navbar-brand {
+    margin-left: 10px;
+}
+
+#myForm {
+    width: 90%;
+    margin: auto;
 }

@@ -9,11 +9,8 @@ from sa_models.users import User
 from sa_models.recovers import Recover
 
 import json
-from py_scripts.forms import (RegisterFormClasses6To7, RegisterFormClasses8To11, LoginForm, RecoverForm,
-                              RegisterFormAdmins)
-from py_scripts.funcs_back import (register_user, generate_data_for_base, generate_and_send_recover_link,
-                                   reset_password,
-                                   register_admin)
+from py_scripts.forms import RegisterForm, LoginForm, RecoverForm, RegisterFormAdmins
+from py_scripts.funcs_back import (register_user, generate_data_for_base, generate_and_send_recover_link, reset_password, register_admin)
 
 
 FOLDER = ''
@@ -93,7 +90,9 @@ class AuthClass:
     def back_register(classes):
         reg_statuses = json.load(open('py_scripts/consts/registration_status.json', mode='rb'))
         admin_link = open('py_scripts/consts/admin_registration_link.txt', mode='r', encoding='utf-8').read()
-        if not reg_statuses.get(classes) and classes != admin_link:
+        if classes != 'register' and classes != admin_link:
+            abort(404)
+        if classes != admin_link and not reg_statuses['6-7'] and not reg_statuses['8-11']:
             abort(404)
 
         if classes == admin_link:
@@ -116,11 +115,12 @@ class AuthClass:
             return render_template('admin_register.html', form=form,
                                    **generate_data_for_base(title))
 
-        title = 'Регистрация на вступительные испытания в 6, 7 классы'
-        form = RegisterFormClasses6To7()
-        if classes == '8-11':
-            title = 'Регистрация на вступительные испытания в 8, 9, 10, 11 классы'
-            form = RegisterFormClasses8To11()
+        title = 'Регистрация на вступительные испытания'
+        form = RegisterForm()
+        if reg_statuses['6-7']:
+            form.class_number.choices.extend([6, 7])
+        if reg_statuses['8-11']:
+            form.class_number.choices.extend([8, 9, 10, 11])
 
         if form.validate_on_submit():
             db_sess = db_session.create_session()
